@@ -1,6 +1,15 @@
 @import 'bulma/css/bulma.css';
 
 body {
-  background-color: #000;
-  color: #fff;
+  margin: 0;
+  overflow: hidden;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+}
+
+.a-enter-vr {
+  display: none !important;
 }
