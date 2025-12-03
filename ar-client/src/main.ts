@@ -1,17 +1,14 @@
 import './style.css';
-import { getActiveCampaign } from './services/api';
+import { getActiveCampaignTargets } from './services/api';
 import { initAR } from './ar-setup';
-import { StartScreen } from './components/StartScreen';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
 const render = async () => {
   try {
-    const campaign = await getActiveCampaign();
-    
-    // Auto start AR
+    const targets = await getActiveCampaignTargets();
     if (app) app.style.display = 'none';
-    initAR(campaign);
+    initAR(targets);
 
   } catch (error) {
     console.error(error);

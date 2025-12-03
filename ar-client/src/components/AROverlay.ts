@@ -1,7 +1,7 @@
 export const AROverlay = () => {
   return `
     <div>
-        AR Overlay Component
+      AR Overlay Component
     </div>
   `;
 };

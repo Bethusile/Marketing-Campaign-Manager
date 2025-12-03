@@ -1,15 +1,122 @@
 @import 'bulma/css/bulma.css';
 
+/* Load Inter font (used in screenshot) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+/* General body setup */
 body {
   margin: 0;
   overflow: hidden;
+  font-family: 'Inter', sans-serif !important;
+  width: 100%;
+  height: 100%;
 }
 
-#app {
-  position: relative;
-  z-index: 1;
+/* Fix for MindAR video alignment */
+video {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  max-width: none !important;
+  max-height: none !important;
 }
 
-.a-enter-vr {
-  display: none !important;
+/* Dropdown container */
+#dropdown-message {
+  position: fixed;
+  top: -250px; /* hidden initially, slides down */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 430px;
+
+  /* Semi-transparent black background */
+  background: rgba(0, 0, 0, 0.5);
+
+  /* Border */
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 18px;
+
+  /* Blur effect exactly like screenshot */
+  backdrop-filter: blur(10px);
+
+  /* Spacing */
+  padding: 28px 25px;
+  text-align: center;
+
+  /* Shadow to lift from background */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  z-index: 9999;
+
+  /* Smooth slide animation */
+  transition: top 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#dropdown-message.visible {
+  top: 20px;
+}
+
+/* Main text */
+#dropdown-message .message-text {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: white;
+  margin-bottom: 20px;
+  line-height: 1.25;
+}
+
+/* If user inserts <span class="highlight-red"> */
+.highlight-red {
+  color: #ff3b2f; /* same red tone seen in screenshot */
+}
+
+#dropdown-message .message-text b,
+#dropdown-message .message-text strong {
+  font-weight: 700;
+}
+
+#dropdown-message .message-text i,
+#dropdown-message .message-text em {
+  font-style: italic;
+}
+
+#dropdown-message .message-text u {
+  text-decoration: underline;
+}
+
+/* Button: white pill with dark text */
+#dropdown-message .dropdown-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  background: white;
+  color: #111;
+  padding: 14px 28px;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  border-radius: 999px; /* pill shape */
+  border: none;
+
+  text-decoration: none;
+
+  transition: all 0.2s ease;
+}
+
+/* Hover: slight dim */
+#dropdown-message .dropdown-button:hover {
+  filter: brightness(0.93);
+}
+
+/* Arrow movement */
+#dropdown-message .dropdown-button .icon {
+  transition: transform 0.2s ease;
+}
+
+#dropdown-message .dropdown-button:hover .icon {
+  transform: translateX(4px);
 }
