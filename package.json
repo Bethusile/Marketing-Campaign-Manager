@@ -1,0 +1,24 @@
+{
+  "name": "arm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "setup": "npm install && npm install --prefix server && npm install --prefix marketing-client && npm install --prefix ar-client",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix marketing-client\" \"npm run dev --prefix ar-client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbd-vac-work/arm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bbd-vac-work/arm/issues"
+  },
+  "homepage": "https://github.com/bbd-vac-work/arm#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
