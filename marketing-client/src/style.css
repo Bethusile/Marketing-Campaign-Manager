@@ -1,6 +1,71 @@
 @import 'bulma/css/bulma.css';
 
+
+/* style.css content - You may need to import this file in index.html */
+
+/* 1. Main Background */
 body {
-  background-color: #f5f5f5;
+  background-color: #1a1a1a;
   min-height: 100vh;
+}
+
+/* 2. Navbar/Header Styling (Based on your screenshot) */
+.navbar-app {
+    background-color: #0d0d0d; /* Even darker header */
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+}
+
+/* 3. Custom Bulma Overrides/Enhancements */
+
+/* For dark inputs/dropdowns */
+.select select,
+.input.search-input {
+    background-color: rgba(30, 30, 30, 0.8); /* Semi-transparent dark input */
+    border-color: #444;
+    color: #fff;
+}
+
+.select select option {
+    background-color: #1a1a1a; /* Ensure options are dark */
+}
+
+.input.search-input::placeholder {
+    color: #999;
+}
+
+/* 4. The Glassmorphism Card Effect */
+.card-glass {
+    /* Subtle background blur/transparency */
+    background-color: rgba(40, 40, 40, 0.4);
+    backdrop-filter: blur(10px); /* The key for the glass effect */
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(68, 68, 68, 0.2); /* Light border */
+    border-radius: 12px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    transition: transform 0.2s;
+}
+
+.card-glass:hover {
+    transform: translateY(-5px); /* Lift card on hover */
+    box-shadow: 0 8px 35px rgba(0, 0, 0, 0.4);
+}
+
+.campaign-card .card-image {
+    position: relative;
+    border-radius: 12px 12px 0 0; /* Match card radius */
+    overflow: hidden; /* Ensure image doesn't bleed */
+}
+
+.campaign-card .card-content {
+    background: transparent; /* Ensure content area is transparent to show glass background */
+}
+
+/* Status Tag Positioning */
+.campaign-status-tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-weight: bold;
+    z-index: 10;
 }
