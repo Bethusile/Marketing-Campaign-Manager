@@ -19,15 +19,14 @@ export const createDropdownMessage = (
   a.target = "_blank";
   a.className = "dropdown-button";
 
-  const spanText = document.createElement("span");
-  spanText.textContent = "Visit Website";
+  const textNode = document.createTextNode("Visit Website");
 
-  const spanIcon = document.createElement("span");
-  spanIcon.className = "icon";
-  spanIcon.textContent = "➜";
+  const icon = document.createElement("i");
+  icon.className = "icon";
+  icon.textContent = "➜";
 
-  a.appendChild(spanText);
-  a.appendChild(spanIcon);
+  a.appendChild(textNode);
+  a.appendChild(icon);
   nav.appendChild(a);
 
   section.appendChild(p);
