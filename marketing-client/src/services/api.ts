@@ -1,7 +1,13 @@
 import axios from 'axios';
 
 export interface Campaign {
-  // Define campaign interface
+  id: number;
+  title: string;
+  message: string;
+  redactedImageUrl: string;
+  unredactedImageUrl: string;
+  isActive: boolean;
+  createdAt: string;
 }
 
 export const getCampaigns = async () => {

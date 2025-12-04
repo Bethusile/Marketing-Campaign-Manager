@@ -14,8 +14,10 @@
     "vite": "^7.2.4"
   },
   "dependencies": {
+    "aframe": "^1.5.0",
     "axios": "^1.13.2",
-    "bulma": "^1.0.4"
+    "bulma": "^1.0.4",
+    "mind-ar": "^1.2.5"
   },
   "description": "",
   "main": "index.js",

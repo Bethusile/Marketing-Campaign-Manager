@@ -1,231 +1,135 @@
-import { getCampaign } from './services/api';
-import { DropdownMessage } from './components/DropdownMessage';
+//JaysonBam
+//Main AR logic with AFrame
 
-declare const AFRAME: any;
-declare const MINDAR: any;
+import { getCampaign } from "./services/api";
+import { createDropdownMessage } from "./components/DropdownMessage";
+import type { AFrameEntity, AFrameComponent } from "./types";
+import { enforceHighQualityCamera } from "./utils/camera";
 
-// Store the mapping of target index to campaign ID
-let targetCampaignMap: Record<number, number> = {};
-
-const loadImage = (src: string): Promise<HTMLImageElement> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
+declare const AFRAME: {
+  registerComponent: (name: string, def: object) => void;
 };
 
-const compileTargets = async (imageUrls: string[]): Promise<string> => {
-  const images = await Promise.all(imageUrls.map(loadImage));
-  const compiler = new MINDAR.IMAGE.Compiler();
-  
-  console.log('Compiling targets...');
-  await compiler.compileImageTargets(images, (progress: number) => {
-    console.log('Compilation progress:', progress);
-  });
-  
-  const exportedBuffer = await compiler.exportData();
-  const blob = new Blob([exportedBuffer]);
-  return URL.createObjectURL(blob);
-};
+const updateOrReplaceDropdown = (message: string, buttonUrl?: string) => {
+  //only one message at a time
+  const existing = document.getElementById("dropdown-message");
+  if (existing) existing.remove();
 
-export const setupCameraHack = () => {
-  // Hack to force high resolution to try to pick the main camera on mobile
-  // instead of the wide-angle camera which is often default for "environment"
-  const origGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-  navigator.mediaDevices.getUserMedia = function(constraints: any) {
-      if (constraints.video && constraints.video.facingMode === 'environment') {
-          // Adding width/height constraints often forces the main camera
-          constraints.video.width = { min: 1280, ideal: 1920, max: 2560 };
-          constraints.video.height = { min: 720, ideal: 1080, max: 1440 };
-          constraints.video.frameRate = { ideal: 60 };
-      }
-      return origGetUserMedia(constraints);
-  };
+  const newEl = createDropdownMessage(message, buttonUrl || "");
+
+  document.body.appendChild(newEl);
+  // Trigger reflow then show
+  void newEl.offsetWidth;
+  newEl.classList.add("visible");
+  return newEl;
 };
 
 export const registerComponents = () => {
-  if (typeof AFRAME === 'undefined') return;
-
-  // Component to set the aspect ratio of the image to match its natural dimensions
-  AFRAME.registerComponent('fix-aspect-ratio', {
-      init: function () {
-          this.updateRatio();
-      },
-      updateRatio: function() {
-          const el = this.el;
-          const src = el.getAttribute('src');
-          if (!src) return;
-
-          if (src.startsWith('#')) {
-              const img = document.querySelector(src);
-              if (img) {
-                  if (img.complete) {
-                      this.setRatio(img);
-                  } else {
-                      img.onload = () => {
-                          this.setRatio(img);
-                      };
-                  }
-              }
-          } else {
-              // Direct URL
-              const img = new Image();
-              img.onload = () => this.setRatio(img);
-              img.src = src;
-          }
-      },
-      setRatio: function (img: any) {
-          if (img.naturalWidth === 0) return;
-          const ratio = img.naturalHeight / img.naturalWidth;
-          this.el.setAttribute('height', ratio);
-          this.el.setAttribute('width', '1');
-      }
-  });
-
-  AFRAME.registerComponent('target-handler', {
+  // target-handler: listens for targetFound and then loads campaign data
+  AFRAME.registerComponent("target-handler", {
     schema: {
-      targetIndex: { type: 'number' }
+      campaignId: { type: "number" },
     },
-    init: function () {
-      this.el.addEventListener('targetFound', async () => {
-        console.log('Target found');
-        
-        // Get the campaign ID associated with this target index
-        const campaignId = targetCampaignMap[this.data.targetIndex];
-        if (!campaignId) return;
 
-        const campaign = await getCampaign(campaignId);
-        if (!campaign) return;
+    init(this: AFrameComponent) {
+      const element = this.el;
+      const aImage = element.querySelector("a-image") as AFrameEntity | null;
 
-        // Update the overlay image specific to this entity
-        const aImage = this.el.querySelector('a-image');
-        if (aImage) {
-            aImage.setAttribute('src', campaign.display_url);
-            // Manually trigger aspect ratio update since we changed the src
-            if (aImage.components['fix-aspect-ratio']) {
-                aImage.components['fix-aspect-ratio'].updateRatio();
-            }
+      if (aImage) {
+        aImage.addEventListener("materialtextureloaded", (e: any) => {
+          const texture = e.detail.texture;
+          if (!texture || !texture.image) return;
+
+          const width = texture.image.naturalWidth || texture.image.width;
+          const height = texture.image.naturalHeight || texture.image.height;
+
+          if (width && height) {
+            const ratio = height / width;
+            aImage.setAttribute("height", String(ratio));
+            aImage.setAttribute("width", "1");
+          }
+        });
+      }
+
+      element.addEventListener("targetFound", async () => {
+        try {
+          console.log("Target found");
+          const campaignId = this.data?.campaignId as number | undefined;
+          if (!campaignId) return;
+
+          const campaign = await getCampaign(campaignId);
+          if (!campaign) return;
+
+          // Update overlay image
+          if (aImage) {
+            aImage.setAttribute("src", campaign.displayUrl);
+          }
+
+          // Wait 3s then show/update dropdown
+          setTimeout(() => {
+            updateOrReplaceDropdown(campaign.message, campaign.buttonUrl);
+          }, 3000);
+        } catch (err) {
+          console.error("target-handler: error handling targetFound", err);
         }
-
-        setTimeout(() => {
-          // Check if it already exists
-          let dropdown = document.getElementById('dropdown-message');
-          
-          if (!dropdown) {
-            const dropdownContainer = document.createElement('div');
-            dropdownContainer.innerHTML = DropdownMessage(campaign.message, campaign.button_url);
-            document.body.appendChild(dropdownContainer);
-            
-            // Re-query to get the actual element with the ID
-            dropdown = document.getElementById('dropdown-message');
-          } else {
-             // Update existing dropdown content if it exists (e.g. if switching targets)
-             dropdown.innerHTML = DropdownMessage(campaign.message, campaign.button_url);
-             // Note: DropdownMessage returns the outer div string, so we might need to be careful here.
-             // Actually, DropdownMessage returns the full HTML string including the id="dropdown-message" div.
-             // So if we want to update, we should probably replace the element or update its children.
-             // For simplicity, let's remove and re-add or just update the inner parts.
-             // But since the structure is simple, let's just replace the outerHTML or innerHTML of the parent?
-             // Let's just remove the old one and add new one to be safe.
-             dropdown.remove();
-             const dropdownContainer = document.createElement('div');
-             dropdownContainer.innerHTML = DropdownMessage(campaign.message, campaign.button_url);
-             document.body.appendChild(dropdownContainer);
-             dropdown = document.getElementById('dropdown-message');
-          }
-
-          if (dropdown) {
-            // Force reflow to ensure transition happens
-            void dropdown.offsetWidth;
-            dropdown.classList.add('visible');
-          }
-        }, 3000);
       });
-    }
+    },
   });
 };
 
-export const initAR = async (targets: Record<number, string>) => {
-  setupCameraHack();
+const createCamera = () => {
+  const camera = document.createElement("a-camera");
+  camera.setAttribute("position", "0 0 0");
+  camera.setAttribute("look-controls", "enabled: false");
+  return camera;
+};
+
+const createTargetEntity = (index: number, campaignId: number) => {
+  const entity = document.createElement("a-entity");
+  entity.setAttribute("mindar-image-target", `targetIndex: ${index}`);
+  entity.setAttribute("target-handler", `campaignId: ${campaignId}`);
+
+  const aImage = document.createElement("a-image");
+  aImage.setAttribute("rotation", "0 0 0");
+  aImage.setAttribute("position", "0 0 0");
+  aImage.setAttribute("width", "1");
+  aImage.setAttribute("height", "1");
+
+  entity.appendChild(aImage);
+  return entity;
+};
+
+
+export const initAR = async (compiledMindUrl: string, campaignIds: number[]) => {
+  enforceHighQualityCamera();
   registerComponents();
 
   const body = document.body;
-  
-  const campaignIds = Object.keys(targets).map(Number);
-  if (campaignIds.length === 0) {
-      console.error("No active campaigns found");
-      return;
-  }
 
-  // Collect all target image URLs
-  const targetImageUrls = campaignIds.map(id => targets[id]);
+  // build the A-Frame scene in a minimal DOM-safe manner
+  const sceneContainer = document.createElement("div");
+  sceneContainer.className = "ar-scene-container";
 
-  // Compile them into a single .mind file
-  let compiledMindUrl: string;
-  try {
-    // Show loading state
-    const loadingDiv = document.createElement('div');
-    loadingDiv.id = 'ar-loading';
-    loadingDiv.style.position = 'fixed';
-    loadingDiv.style.top = '50%';
-    loadingDiv.style.left = '50%';
-    loadingDiv.style.transform = 'translate(-50%, -50%)';
-    loadingDiv.style.background = 'rgba(0,0,0,0.7)';
-    loadingDiv.style.color = 'white';
-    loadingDiv.style.padding = '20px';
-    loadingDiv.style.borderRadius = '10px';
-    loadingDiv.innerText = 'Compiling AR Targets...';
-    body.appendChild(loadingDiv);
+  const scene = document.createElement("a-scene");
+  scene.setAttribute(
+    "mindar-image",
+    `imageTargetSrc: ${compiledMindUrl}; autoStart: true; uiScanning: no;`,
+  );
+  scene.setAttribute("color-space", "sRGB");
+  scene.setAttribute(
+    "renderer",
+    "colorManagement: true, physicallyCorrectLights",
+  );
+  scene.setAttribute("vr-mode-ui", "enabled: false");
+  scene.setAttribute("device-orientation-permission-ui", "enabled: false");
 
-    compiledMindUrl = await compileTargets(targetImageUrls);
-    
-    body.removeChild(loadingDiv);
-  } catch (error) {
-    console.error('Failed to compile targets:', error);
-    alert('Failed to initialize AR targets.');
-    return;
-  }
+  // camera
+  scene.appendChild(createCamera());
 
-  // Generate an entity for each campaign, mapping the index to the campaign ID
-  const entities = campaignIds.map((id, index) => {
-    targetCampaignMap[index] = id;
-    return `
-      <a-entity mindar-image-target="targetIndex: ${index}" target-handler="targetIndex: ${index}">
-        <a-image src="#overlayImage" rotation="0 0 0" position="0 0 0" width="1" height="1" fix-aspect-ratio></a-image>
-      </a-entity>
-    `;
-  }).join('\n');
+  campaignIds.forEach((id, index) => {
+    scene.appendChild(createTargetEntity(index, id));
+  });
 
-  // Initial overlay image can be empty or a placeholder until detection
-  const initialImageUrl = ""; 
-
-  const sceneHTML = `
-    <a-scene mindar-image="imageTargetSrc: ${compiledMindUrl}; autoStart: true; uiScanning: no;"
-             color-space="sRGB"
-             renderer="colorManagement: true, physicallyCorrectLights"
-             vr-mode-ui="enabled: false"
-             device-orientation-permission-ui="enabled: false">
-
-        <a-assets>
-            <img id="overlayImage" src="${initialImageUrl}" crossorigin="anonymous" />
-        </a-assets>
-
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-        ${entities}
-    </a-scene>
-  `;
-
-  const sceneContainer = document.createElement('div');
-  sceneContainer.style.position = 'fixed';
-  sceneContainer.style.top = '0';
-  sceneContainer.style.left = '0';
-  sceneContainer.style.width = '100%';
-  sceneContainer.style.height = '100%';
-  sceneContainer.style.zIndex = '0';
-  sceneContainer.style.overflow = 'hidden';
-  sceneContainer.innerHTML = sceneHTML;
+  sceneContainer.appendChild(scene);
   body.appendChild(sceneContainer);
 };
