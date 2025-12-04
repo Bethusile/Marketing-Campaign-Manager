@@ -1,7 +1,7 @@
 # My Project
 
 ## Project Overview
-This is a standard Express Node.js backend using TypeScript and PostgreSQL (via Sequelize). It follows a scalable file structure for maintainable development.
+This is a standard Express Node.js backend using TypeScript and PostgreSQL
 
 ## File Structure
 ```
