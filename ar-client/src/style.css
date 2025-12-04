@@ -118,6 +118,7 @@ video {
 /* Arrow movement */
 #dropdown-message .dropdown-button .icon {
   transition: transform 0.2s ease;
+  font-style: normal;
 }
 
 #dropdown-message .dropdown-button:hover .icon {
