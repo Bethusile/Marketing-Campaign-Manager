@@ -1,94 +1,135 @@
-import type { Campaign } from './services/api';
+//JaysonBam
+//Main AR logic with AFrame
 
-declare const AFRAME: any;
+import { getCampaign } from "./services/api";
+import { createDropdownMessage } from "./components/DropdownMessage";
+import type { AFrameEntity, AFrameComponent } from "./types";
+import { enforceHighQualityCamera } from "./utils/camera";
 
-export const setupCameraHack = () => {
-  // Hack to force high resolution to try to pick the main camera on mobile
-  // instead of the wide-angle camera which is often default for "environment"
-  const origGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-  navigator.mediaDevices.getUserMedia = function(constraints: any) {
-      if (constraints.video && constraints.video.facingMode === 'environment') {
-          // Adding width/height constraints often forces the main camera
-          constraints.video.width = { min: 1280, ideal: 1920, max: 2560 };
-          constraints.video.height = { min: 720, ideal: 1080, max: 1440 };
-          constraints.video.frameRate = { ideal: 60 };
-      }
-      return origGetUserMedia(constraints);
-  };
+declare const AFRAME: {
+  registerComponent: (name: string, def: object) => void;
+};
+
+const updateOrReplaceDropdown = (message: string, buttonUrl?: string) => {
+  //only one message at a time
+  const existing = document.getElementById("dropdown-message");
+  if (existing) existing.remove();
+
+  const newEl = createDropdownMessage(message, buttonUrl || "");
+
+  document.body.appendChild(newEl);
+  // Trigger reflow then show
+  void newEl.offsetWidth;
+  newEl.classList.add("visible");
+  return newEl;
 };
 
 export const registerComponents = () => {
-  if (typeof AFRAME === 'undefined') return;
+  // target-handler: listens for targetFound and then loads campaign data
+  AFRAME.registerComponent("target-handler", {
+    schema: {
+      campaignId: { type: "number" },
+    },
 
-  // Component to set the aspect ratio of the image to match its natural dimensions
-  AFRAME.registerComponent('fix-aspect-ratio', {
-      init: function () {
-          const el = this.el;
-          const src = el.getAttribute('src');
-          // Handle both selector and direct url
-          const img = document.querySelector(src);
-          
-          if (img) {
-              if (img.complete) {
-                  this.setRatio(img);
-              } else {
-                  img.onload = () => {
-                      this.setRatio(img);
-                  };
-              }
+    init(this: AFrameComponent) {
+      const element = this.el;
+      const aImage = element.querySelector("a-image") as AFrameEntity | null;
+
+      if (aImage) {
+        aImage.addEventListener("materialtextureloaded", (e: any) => {
+          const texture = e.detail.texture;
+          if (!texture || !texture.image) return;
+
+          const width = texture.image.naturalWidth || texture.image.width;
+          const height = texture.image.naturalHeight || texture.image.height;
+
+          if (width && height) {
+            const ratio = height / width;
+            aImage.setAttribute("height", String(ratio));
+            aImage.setAttribute("width", "1");
           }
-      },
-      setRatio: function (img: any) {
-          if (img.naturalWidth === 0) return;
-          const ratio = img.naturalHeight / img.naturalWidth;
-          this.el.setAttribute('height', ratio);
-          this.el.setAttribute('width', '1');
+        });
       }
+
+      element.addEventListener("targetFound", async () => {
+        try {
+          console.log("Target found");
+          const campaignId = this.data?.campaignId as number | undefined;
+          if (!campaignId) return;
+
+          const campaign = await getCampaign(campaignId);
+          if (!campaign) return;
+
+          // Update overlay image
+          if (aImage) {
+            aImage.setAttribute("src", campaign.displayUrl);
+          }
+
+          // Wait 3s then show/update dropdown
+          setTimeout(() => {
+            updateOrReplaceDropdown(campaign.message, campaign.buttonUrl);
+          }, 3000);
+        } catch (err) {
+          console.error("target-handler: error handling targetFound", err);
+        }
+      });
+    },
   });
 };
 
-export const initAR = (campaign: Campaign) => {
-  setupCameraHack();
+const createCamera = () => {
+  const camera = document.createElement("a-camera");
+  camera.setAttribute("position", "0 0 0");
+  camera.setAttribute("look-controls", "enabled: false");
+  return camera;
+};
+
+const createTargetEntity = (index: number, campaignId: number) => {
+  const entity = document.createElement("a-entity");
+  entity.setAttribute("mindar-image-target", `targetIndex: ${index}`);
+  entity.setAttribute("target-handler", `campaignId: ${campaignId}`);
+
+  const aImage = document.createElement("a-image");
+  aImage.setAttribute("rotation", "0 0 0");
+  aImage.setAttribute("position", "0 0 0");
+  aImage.setAttribute("width", "1");
+  aImage.setAttribute("height", "1");
+
+  entity.appendChild(aImage);
+  return entity;
+};
+
+
+export const initAR = async (compiledMindUrl: string, campaignIds: number[]) => {
+  enforceHighQualityCamera();
   registerComponents();
 
   const body = document.body;
-  // Use the URL directly if it starts with http or /, otherwise prepend the uploads path
-  const imageUrl = campaign.unredacted_image_url.startsWith('http') || campaign.unredacted_image_url.startsWith('/')
-    ? campaign.unredacted_image_url
-    : `http://localhost:3000/uploads/${campaign.unredacted_image_url}`;
 
-  const sceneHTML = `
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiScanning: no;"
-             color-space="sRGB"
-             renderer="colorManagement: true, physicallyCorrectLights"
-             vr-mode-ui="enabled: false"
-             device-orientation-permission-ui="enabled: false">
+  // build the A-Frame scene in a minimal DOM-safe manner
+  const sceneContainer = document.createElement("div");
+  sceneContainer.className = "ar-scene-container";
 
-        <a-assets>
-            <img id="overlayImage" src="${imageUrl}" crossorigin="anonymous" />
-        </a-assets>
+  const scene = document.createElement("a-scene");
+  scene.setAttribute(
+    "mindar-image",
+    `imageTargetSrc: ${compiledMindUrl}; autoStart: true; uiScanning: no;`,
+  );
+  scene.setAttribute("color-space", "sRGB");
+  scene.setAttribute(
+    "renderer",
+    "colorManagement: true, physicallyCorrectLights",
+  );
+  scene.setAttribute("vr-mode-ui", "enabled: false");
+  scene.setAttribute("device-orientation-permission-ui", "enabled: false");
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+  // camera
+  scene.appendChild(createCamera());
 
-        <a-entity mindar-image-target="targetIndex: 0">
-            <a-image src="#overlayImage" 
-                     rotation="0 0 0" 
-                     position="0 0 0" 
-                     width="1" 
-                     height="1"
-                     fix-aspect-ratio>
-            </a-image>
-        </a-entity>
-    </a-scene>
-  `;
+  campaignIds.forEach((id, index) => {
+    scene.appendChild(createTargetEntity(index, id));
+  });
 
-  const sceneContainer = document.createElement('div');
-  sceneContainer.style.position = 'fixed';
-  sceneContainer.style.top = '0';
-  sceneContainer.style.left = '0';
-  sceneContainer.style.width = '100%';
-  sceneContainer.style.height = '100%';
-  sceneContainer.style.zIndex = '0';
-  sceneContainer.innerHTML = sceneHTML;
+  sceneContainer.appendChild(scene);
   body.appendChild(sceneContainer);
 };
