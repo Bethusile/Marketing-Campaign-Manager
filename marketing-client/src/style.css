@@ -1,6 +1,402 @@
+/* --- Created by Bethusile --- */
+/* --- BASE (applies to both light & dark) --- */
 @import 'bulma/css/bulma.css';
 
-body {
-  background-color: #f5f5f5;
+/* General non-theme-specific styles */
+html, body {
   min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
+}
+/* Ensure modal is above everything including sticky navbar */
+#campaign-modal {
+    z-index: 2000; /* Higher than navbar-app z-index */
+}
+
+
+/* Ensure Bulma's section doesn't override background */
+.section {
+  background: transparent !important;
+}
+
+/* Neutral card styling */
+.card-glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 12px;
+}
+
+/* Sticky navbar */
+.navbar-app {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Navbar style after scrolling past 50px */
+.navbar-app.navbar-scrolled {
+    background-color: red !important;
+}
+
+.navbar-app.navbar-scrolled .navbar-item,
+.navbar-app.navbar-scrolled .navbar-link,
+.navbar-app.navbar-scrolled .title,
+.navbar-app.navbar-scrolled .icon {
+    color: white ;
+}
+
+.navbar-app.navbar-scrolled .button {
+    background-color: black !important;
+    color: white !important;
+    border: none;
+}
+
+
+
+/* --------------------------------------------------------------- */
+/* ----------------------- LIGHT MODE ---------------------------- */
+/* --------------------------------------------------------------- */
+@media (prefers-color-scheme: light) {
+
+  html, body {
+    background-color: #f4f4f4 !important;
+    color: #222 !important;
+  }
+
+  .navbar-app {
+      background-color: #ffffff !important;
+      border-bottom: 3px solid red !important;
+  }
+
+  /* Navbar text */
+  .navbar-app .navbar-item,
+  .navbar-app .navbar-link,
+  .navbar-app .title,
+  .navbar-app .icon {
+      color: #222 !important;
+  }
+
+  .card-glass {
+      background: rgba(102, 102, 102, 0.4);
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.07);
+  }
+
+  .input.search-input,
+  .select select {
+      background-color: white !important;
+      color: #333 !important;
+      border-color: red !important;
+  }
+
+  .input.search-input::placeholder {
+      color: #666 !important;
+  }
+}
+/* Make the number darker navy-black */
+.subtitle.is-4.has-text-white.mt-5 strong.has-text-info-light {
+    color: #00008B !important;   /* deep navy/black */
+    font-weight: 700;
+}
+
+/* Make the word “Campaigns” dark as well */
+.subtitle.is-4.has-text-white.mt-5 {
+    color: #0a0f1a !important;
+}
+/* ============================= */
+/* Light Mode Card Text Fix */
+/* ============================= */
+@media (prefers-color-scheme: light) {
+
+  /* Ensure card content is readable on semi-dark card background */
+  .campaign-card,
+  .campaign-card .card-content,
+  .campaign-card .card-content p.title,
+  .campaign-card .card-content .content p {
+      color: #ffffff; /* white text for readability */
+  }
+
+  /* Status tags contrast */
+  .tag.is-success {
+      background-color: #23d160;
+      color: #fff;
+  }
+
+  .tag.is-danger {
+      background-color: red;
+      color: #fff;
+  }
+}
+
+
+
+/* --------------------------------------------------------------- */
+/* ----------------------- DARK MODE ----------------------------- */
+/* --------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+
+  html, body {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  .navbar-app {
+      background-color: #0d0d0d !important;
+      border-bottom: 3px solid red !important;
+  }
+
+  /* Navbar text */
+  .navbar-app .navbar-item,
+  .navbar-app .navbar-link,
+  .navbar-app .title,
+  .navbar-app .icon {
+      color: #ffffff !important;
+  }
+
+  .card-glass {
+      background: rgba(40, 40, 40, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .input.search-input,
+  .select select {
+      background-color: rgba(30, 30, 30, 0.8) !important;
+      color: white !important;
+      border-color: red;
+  }
+
+  .select select option {
+      background-color: #121212;
+  }
+
+  .input.search-input::placeholder {
+      color: #888 !important;
+  }
+  /* Make the word “Campaigns” dark as well */
+.subtitle.is-4.has-text-white.mt-5 {
+    color: white !important;
+}
+/* Make the number darker navy-black */
+.subtitle.is-4.has-text-white.mt-5 strong.has-text-info-light {
+    color: #A7C7E7 !important;  
+    font-weight: 700;
+}
+}
+/*--------  SEPARATE THE STYLING FROM HTML ---------*/
+
+/* ============================= */
+/* General Layout & Sections */
+/* ============================= */
+#app-content-wrapper {
+    min-height: 100vh;
+}
+
+.section.is-dark {
+    background-color: #000;
+    padding-top: 3rem;
+}
+
+/* ============================= */
+/* Navbar */
+/* ============================= */
+.navbar-app {
+    border-bottom: 2px solid red;
+    transition: background-color 0.3s;
+}
+
+.navbar-scrolled {
+    /* optional sticky navbar styling */
+}
+
+.navbar-burger span {
+    display: inline-block;
+}
+
+.navbar-item .icon {
+    font-size: 1.5rem;
+}
+
+.navbar-item.is-hidden-desktop .button {
+    width: 100%;
+}
+
+/* ============================= */
+/* Search & Controls */
+/* ============================= */
+.search-input {
+    width: 300px;
+    background-color: black;
+    border: 2px solid red;
+}
+
+.select select {
+    background-color: rgba(60, 60, 60, 0.7);
+    border-radius: 8px;
+    border: none;
+}
+
+.select select.sort-select {
+    border-radius: 10px;
+}
+
+/* ============================= */
+/* Campaign Grid & Cards */
+/* ============================= */
+.campaign-card {
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.campaign-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+.campaign-card img {
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+}
+
+.card-content {
+    flex-grow: 1;
+    padding: 1rem;
+}
+
+.card-content p.title {
+    line-height: 1.2;
+}
+
+.card-content .content p {
+    margin-bottom: 0.25rem;
+}
+
+/* Status tags */
+.tag {
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.tag.is-success {
+    background-color: #23d160; /* Bulma success green */
+}
+
+.tag.is-danger {
+    background-color: red; /* Bulma danger red */
+}
+
+/* ============================= */
+/* Modal */
+/* ============================= */
+.modal-card {
+    width: 80%;
+    max-width: 700px;
+    background: #1e1e1e;
+    border-radius: 16px;
+}
+
+.modal-card-head {
+    background: rgba(30, 30, 30, 0.9);
+    border-bottom: 2px solid red;
+    border-radius: 16px 16px 0 0;
+}
+
+.modal-card-body {
+    padding: 0;
+    background: #2a2a2a;
+}
+
+.modal-card-body img {
+    object-fit: cover;
+    width: 100%;
+    border-radius: 0;
+}
+
+.modal-card-foot {
+    background: #1e1e1e;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 0 0 16px 16px;
+    justify-content: flex-end;
+    margin-right: 10px;
+}
+
+.modal-card-foot .button {
+    margin-left: 0.5rem;
+}
+
+/* ============================= */
+/* Typography */
+/* ============================= */
+.has-text-white {
+    color: #fff ;
+}
+
+.has-text-grey-light {
+    color: #b5b5b5 ;
+}
+
+.has-text-info-light {
+    color: #209cee ;
+}
+
+.subtitle.is-4 {
+    margin-top: 1rem;
+}
+
+/* ============================= */
+/* Columns & Layout Helpers */
+/* ============================= */
+.columns.is-variable {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+}
+
+.columns.is-variable > .column {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+.button{
+  background-color: red;
+  color: white;
+  border: none;
+}
+
+/*------------------    LOGO CHANGES       ---------------------*/
+/* Base: hide all logos first */
+.navbar-logo {
+    display: none;
+    height: 3.5rem; /* adjust as needed */
+    width: auto;
+}
+
+/* Light mode (white navbar) */
+@media (prefers-color-scheme: light) {
+    .navbar-logo.logo-black {
+        display: block; /* show black logo on light bg */
+    }
+}
+
+/* Dark mode (black navbar) */
+@media (prefers-color-scheme: dark) {
+    .navbar-logo.logo-white {
+        display: block; /* show white logo on dark bg */
+    }
+}
+
+/* Scrolled navbar (red bg) */
+.navbar-app.navbar-scrolled .navbar-logo {
+    display: none; /* hide previous logo */
+}
+
+.navbar-app.navbar-scrolled .navbar-logo.logo-red {
+    display: block; /* show red logo when scrolled */
 }
