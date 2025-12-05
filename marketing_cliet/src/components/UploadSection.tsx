@@ -10,7 +10,7 @@ interface FileUploadProps {
 }
 
 // 2. Destructure fileType from the props object, set a default value
-const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image/Doc" }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image/Doc", ...props }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
