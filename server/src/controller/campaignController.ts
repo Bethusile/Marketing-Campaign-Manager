@@ -52,7 +52,7 @@ export const getCampaignById = async (req: Request, res: Response) => {
 export const postCampaign = async (req: Request & { files?: any }, res: Response) => {
   try {
     const overlayFile = req.files && req.files.overlay ? req.files.overlay[0] : null;
-    const targetFile = req.files && req.files.target_url ? req.files.target_url[0] : null;
+    const targetFile = req.files && req.files.target ? req.files.target[0] : null;
     const overlay_url = overlayFile ? `/uploads/${overlayFile.filename}` : '';
     const target_url = targetFile ? `/uploads/${targetFile.filename}` : '';
     // Save text fields directly from body
@@ -77,7 +77,7 @@ export const postCampaign = async (req: Request & { files?: any }, res: Response
 export const updateCampaign = async (req: Request & { files?: any }, res: Response) => {
   try {
     const overlayFile = req.files && req.files.overlay ? req.files.overlay[0] : null;
-    const targetFile = req.files && req.files.target_url ? req.files.target_url[0] : null;
+    const targetFile = req.files && req.files.target ? req.files.target[0] : null;
     const updateData: any = {
       title: req.body.title,
       message: req.body.message,
