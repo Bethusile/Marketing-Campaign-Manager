@@ -55,7 +55,7 @@ Campaign.init({
   sequelize,
   modelName: 'Campaign',
   tableName: 'campaigns',
-  timestamps: true, // Enable automatic timestamps
+  timestamps: true,
 });
 
 export default Campaign;

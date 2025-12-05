@@ -5,17 +5,17 @@ import path from 'path';
 // Multer setup for file uploads
 import multer from 'multer';
 const storage = multer.diskStorage({
-  destination: (req: any, file: any, cb: (error: Error | null, destination: string) => void) => {
+  destination: (_req, _file, cb) => {
     cb(null, path.join(__dirname, '../../public/uploads'));
   },
-  filename: (req: any, file: any, cb: (error: Error | null, filename: string) => void) => {
+  filename: (_req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
+    cb(null, uniqueSuffix);
   },
 });
 export const upload = multer({ storage });
 
-// GET /getCampain/all
+// GET /getCampaign/all
 export const getAllCampaigns = async (req: Request, res: Response) => {
   try {
     const campaigns = await Campaign.findAll();
@@ -25,7 +25,7 @@ export const getAllCampaigns = async (req: Request, res: Response) => {
   }
 };
 
-// GET /getCampain/active
+// GET /getCampaign/active
 export const getActiveCampaigns = async (req: Request, res: Response) => {
   try {
     const campaigns = await Campaign.findAll({ where: { isActive: true } });
@@ -35,7 +35,7 @@ export const getActiveCampaigns = async (req: Request, res: Response) => {
   }
 };
 
-// GET /getCampain/:id
+// GET /getCampaign/:id
 export const getCampaignById = async (req: Request, res: Response) => {
   try {
     const campaign = await Campaign.findOne({ where: { id: req.params.id } });
@@ -47,16 +47,45 @@ export const getCampaignById = async (req: Request, res: Response) => {
 };
 
 
-// POST /postCampain
-// expects fields: overlay (file), button (file), and campaign data in body
-export const postCampaign = async (req: Request & { files?: any }, res: Response) => {
+// POST /postCampaign
+interface CampaignData {
+  title: string;
+  message: string;
+  comments?: string;
+  button_url: string;
+  overlay_url: string;
+  target_url: string;
+}
+
+interface MulterUploadedFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  destination: string;
+  filename: string;
+  path: string;
+  buffer?: Buffer;
+}
+
+
+
+
+export const postCampaign = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const overlayFile = req.files && req.files.overlay ? req.files.overlay[0] : null;
-    const targetFile = req.files && req.files.target ? req.files.target[0] : null;
+    let overlayFile = null;
+    let targetFile = null;
+    if (req.files && !Array.isArray(req.files)) {
+      overlayFile = req.files['overlay']?.[0] ?? null;
+      targetFile = req.files['target']?.[0] ?? null;
+    }
     const overlay_url = overlayFile ? `/uploads/${overlayFile.filename}` : '';
     const target_url = targetFile ? `/uploads/${targetFile.filename}` : '';
-    // Save text fields directly from body
-    const campaignData: any = {
+    const campaignData: CampaignData = {
       title: req.body.title,
       message: req.body.message,
       comments: req.body.comments,
@@ -64,7 +93,7 @@ export const postCampaign = async (req: Request & { files?: any }, res: Response
       overlay_url,
       target_url,
     };
-    const campaign = await Campaign.create(campaignData);
+    const campaign = await Campaign.create({ ...campaignData });
     res.status(201).json(campaign);
   } catch (err) {
     res.status(400).json({ error: 'Failed to create campaign', details: err });
@@ -72,13 +101,19 @@ export const postCampaign = async (req: Request & { files?: any }, res: Response
 };
 
 
-// PUT /updateCampain/:id
-// expects fields: overlay (file), button (file), and campaign data in body
-export const updateCampaign = async (req: Request & { files?: any }, res: Response) => {
+// PUT /updateCampaign/:id
+export const updateCampaign = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const overlayFile = req.files && req.files.overlay ? req.files.overlay[0] : null;
-    const targetFile = req.files && req.files.target ? req.files.target[0] : null;
-    const updateData: any = {
+    let overlayFile = null;
+    let targetFile = null;
+    if (req.files && !Array.isArray(req.files)) {
+      overlayFile = req.files['overlay']?.[0] ?? null;
+      targetFile = req.files['target']?.[0] ?? null;
+    }
+    const updateData: Partial<CampaignData> = {
       title: req.body.title,
       message: req.body.message,
       comments: req.body.comments,
@@ -86,7 +121,7 @@ export const updateCampaign = async (req: Request & { files?: any }, res: Respon
     };
     if (overlayFile) updateData.overlay_url = `/uploads/${overlayFile.filename}`;
     if (targetFile) updateData.target_url = `/uploads/${targetFile.filename}`;
-    const [affectedRows] = await Campaign.update(updateData, {
+    const [affectedRows] = await Campaign.update({ ...updateData }, {
       where: { id: req.params.id },
     });
     if (!affectedRows) return res.status(404).json({ error: 'Campaign not found' });
@@ -97,7 +132,7 @@ export const updateCampaign = async (req: Request & { files?: any }, res: Respon
   }
 };
 
-// DELETE /detelCAmpain/:id
+// DELETE /deleteCampaign/:id
 export const deleteCampaign = async (req: Request, res: Response) => {
   try {
     const campaign = await Campaign.findOne({ where: { id: req.params.id } });

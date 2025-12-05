@@ -15,28 +15,28 @@ import { getTarget } from '../controller/targetController';
 const router = Router();
 
 // Campaign routes
-router.get('/getCampain/all', allowAll, getAllCampaigns);
-router.get('/getCampain/active', allowAll, getActiveCampaigns);
-router.get('/getCampain/:id', allowAll, getCampaignById);
+router.get('/getCampaign/all', allowAll, getAllCampaigns);
+router.get('/getCampaign/active', allowAll, getActiveCampaigns);
+router.get('/getCampaign/:id', allowAll, getCampaignById);
 router.post(
-  '/postCampain',
+  '/postCampaign',
   allowAll,
   upload.fields([
     { name: 'overlay', maxCount: 1 },
     { name: 'target', maxCount: 1 },
   ]),
-  postCampaign
+  (req, res) => { void postCampaign(req, res); }
 );
 router.put(
-  '/updateCampain/:id',
+  '/updateCampaign/:id',
   allowAll,
   upload.fields([
     { name: 'overlay', maxCount: 1 },
     { name: 'target', maxCount: 1 },
   ]),
-  updateCampaign
+  (req, res) => { void updateCampaign(req, res); }
 );
-router.delete('/detelCAmpain/:id', allowAll, deleteCampaign);
+router.delete('/deleteCampaign/:id', allowAll, deleteCampaign);
 
 // Target route
 router.get('/getTarget', allowAll, getTarget);
