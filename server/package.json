@@ -4,6 +4,7 @@
   "description": "Standard Express Node.js TypeScript backend",
   "main": "dist/index.js",
   "scripts": {
+    "prestart": "npm run build",
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
     "build": "tsc",
