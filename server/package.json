@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "migrate:campaign": "ts-node scripts/migrateCampaign.ts"
   },
   "keywords": [],
   "author": "",
