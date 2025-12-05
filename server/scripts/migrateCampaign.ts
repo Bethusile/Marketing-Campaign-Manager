@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { connectDB, sequelize } from '../src/db/connect';
 import Campaign from '../src/model/campaign';
 

@@ -1,13 +1,17 @@
 import { Request, Response } from 'express';
-import Campaign from '../model/campaign';
 
 // GET /getTarget
+import path from 'path';
+import fs from 'fs';
+
 export const getTarget = async (req: Request, res: Response) => {
   try {
-    // Example: return all target_urls from campaigns
-    const targets = await Campaign.findAll({ attributes: ['id', 'target_url'] });
-    res.json(targets);
+    const filePath = path.join(__dirname, '../../public/target/target.mind');
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'target.mind file not found' });
+    }
+    res.sendFile(path.resolve(filePath));
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch targets' });
+    res.status(500).json({ error: 'Failed to fetch target.mind file' });
   }
 };
