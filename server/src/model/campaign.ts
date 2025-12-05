@@ -34,6 +34,11 @@ Campaign.init({
     allowNull: false,
     defaultValue: '',
   },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   comments: {
     type: DataTypes.TEXT, 
     allowNull: true,
