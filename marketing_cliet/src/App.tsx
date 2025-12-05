@@ -5,6 +5,7 @@ import { red } from '@mui/material/colors';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Campaign from './pages/Campaign';
+import EditPage from './pages/EditPage';
 
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -30,6 +31,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/campaign" element={<Campaign />} />
+          <Route path="/edit" element={<EditPage />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

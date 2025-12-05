@@ -5,20 +5,13 @@ import NavBar from '../components/NavBar';
 import UploadFile from '../components/UploadSection';
 import Button from '../components/CustomButton';
 import Input from '../components/CustomInput';
-import Dropdown from '../components/CustomDropdown';
-import { useNavigate } from 'react-router-dom'; 
+import Dropdown from '../components/CustomDropdown'; 
 import '../styles.css'; // Imports should be at the top
 
 const Campaign: React.FC = () => {
-
   return (
     <>
       <NavBar />
-      <Container>
-        <Typography variant="h5" component="section" gutterBottom>
-                    Compaign
-                  </Typography>
-      </Container>
       <Container>
         <Dropdown label={'Status'} value={''} options={[{ value: 'active', label: 'Active' },{ value: 'inactive', label: 'Inactive' }]} onChange={function (event: React.ChangeEvent<HTMLInputElement>): void {
           throw new Error('Function not implemented.');
@@ -38,7 +31,7 @@ const Campaign: React.FC = () => {
         <Input label="Comment" />
       </Container>
       <Container>
-        <Button label="Upload Campaign"/>
+        <Button label="Save" />
       </Container>
       
     </>

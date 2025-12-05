@@ -1,14 +1,15 @@
 import React from 'react';
 import { Container, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import NavBar from '../components/NavBar';
+
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <>
-      <Header />
+      <NavBar />
       <Container className="dashboardContainer">
         <Typography variant="h4" gutterBottom>
           Dashboard
