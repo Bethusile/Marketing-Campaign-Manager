@@ -1,9 +1,9 @@
-import React from 'react';
+import type { FC } from 'react';
 import { Container, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 
-const Dashboard: React.FC = () => {
+const Dashboard: FC = () => {
   const navigate = useNavigate();
 
   return (
