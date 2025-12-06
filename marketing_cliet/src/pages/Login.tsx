@@ -1,8 +1,8 @@
-import React from 'react';
+import type { FC } from 'react';
 import { Box, Card, CardContent, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const Login: React.FC = () => {
+const Login: FC = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
