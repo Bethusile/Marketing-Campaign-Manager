@@ -21,6 +21,7 @@ export const getAllCampaigns = async (req: Request, res: Response) => {
     const campaigns = await Campaign.findAll();
     res.json(campaigns);
   } catch (err) {
+    console.error('Error in getAllCampaigns:', err);
     res.status(500).json({ error: 'Failed to fetch campaigns' });
   }
 };
@@ -31,6 +32,7 @@ export const getActiveCampaigns = async (req: Request, res: Response) => {
     const campaigns = await Campaign.findAll({ where: { isActive: true } });
     res.json(campaigns);
   } catch (err) {
+    console.error('Error in getActiveCampaigns:', err);
     res.status(500).json({ error: 'Failed to fetch active campaigns' });
   }
 };
@@ -42,6 +44,7 @@ export const getCampaignById = async (req: Request, res: Response) => {
     if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
     res.json(campaign);
   } catch (err) {
+    console.error('Error in getCampaignById:', err);
     res.status(500).json({ error: 'Failed to fetch campaign' });
   }
 };
