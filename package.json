@@ -2,9 +2,8 @@
   "name": "arm-workspace",
   "private": true,
   "scripts": {
-    "install:all": "npm --prefix ar_client install && npm --prefix marketing_cliet install && npm --prefix server install",
-    "dev:all": "npx concurrently \"npm --prefix ar_client run dev\" \"npm --prefix marketing_cliet run dev\" \"npm --prefix server run start\"",
-    "build:all": "npm --prefix ar_client run build && npm --prefix marketing_cliet run build && npm --prefix server run build"
+    "install:all": "npm --prefix ar_client install && npm --prefix marketing_client install && npm --prefix server install",
+    "dev:all": "npx concurrently \"npm --prefix ar_client run dev\" \"npm --prefix marketing_client run dev\" \"npm --prefix server run build && npm --prefix server run start\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
