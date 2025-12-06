@@ -1,8 +1,8 @@
-import React from 'react';
+import type { FC } from 'react';
 import { Container, Typography } from '@mui/material';
 import Header from '../components/Header';
 
-const Campaign: React.FC = () => {
+const Campaign: FC = () => {
   return (
     <>
       <Header />
