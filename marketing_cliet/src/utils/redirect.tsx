@@ -1,8 +1,8 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; 
-
 const redirectTo = (path: string) => {
-  const navigate = useNavigate();
-  navigate(path);
-}
+  // simple redirect utility for non-hook usage
+  if (typeof window !== 'undefined') {
+    window.location.pathname = path;
+  }
+};
+
 export default redirectTo;

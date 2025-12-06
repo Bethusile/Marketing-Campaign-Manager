@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 // Ensure this path points to where you saved the NavBar file
 import NavBar from '../components/NavBar';
 import UploadFile from '../components/UploadSection';
@@ -13,7 +13,7 @@ const Campaign: React.FC = () => {
     <>
       <NavBar />
       <Container>
-        <Dropdown label={'Status'} value={''} options={[{ value: 'active', label: 'Active' },{ value: 'inactive', label: 'Inactive' }]} onChange={function (event: React.ChangeEvent<HTMLInputElement>): void {
+        <Dropdown label={'Status'} value={''} options={[{ value: 'active', label: 'Active' },{ value: 'inactive', label: 'Inactive' }]} onChange={function (): void {
           throw new Error('Function not implemented.');
         } } />
         <Input label="Title" />
@@ -21,9 +21,9 @@ const Campaign: React.FC = () => {
         <Input label="URL" />
       </Container>
       <Container className="campaignUpload">
-        <UploadFile onFileSelect={function (file: File | null): void {
+        <UploadFile onFileSelect={function (): void {
           throw new Error('Function not implemented.');
-        } } fileType='redacted'/><UploadFile onFileSelect={function (file: File | null): void {
+        } } fileType='redacted'/><UploadFile onFileSelect={function (): void {
           throw new Error('Function not implemented.');
         } } fileType='unredacted'/>
       </Container>

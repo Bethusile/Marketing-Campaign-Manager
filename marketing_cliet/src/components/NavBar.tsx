@@ -149,4 +149,3 @@ const NavBar: React.FC<NavBarProps> = ({ onUploadClick }) => {
 };
 
 export default NavBar;
->>>>>>> origin/dev

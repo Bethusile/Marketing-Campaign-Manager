@@ -59,7 +59,7 @@ const Dashboard: React.FC = () => {
 
         <Grid container spacing={3}>
           {filtered.map((campaign) => (
-            <Grid item key={campaign.id} xs={12} sm={6} md={4}>
+            <Grid key={campaign.id} sx={{ width: { xs: '100%', sm: '50%', md: '32%' } }}>
               <CampaignCard campaign={campaign} onCardClick={openDetails} />
             </Grid>
           ))}
