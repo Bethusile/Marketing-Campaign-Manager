@@ -10,3 +10,11 @@
   text-align: center;
   padding: 1rem;
 }
+.campaignUpload{
+  display: flex;
+}
+.header {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}

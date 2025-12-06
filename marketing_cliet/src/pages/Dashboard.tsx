@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { Container, Grid } from '@mui/material';
+import { Container, Grid, Button, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import CampaignCard from '../components/CampaignCard';
 import CampaignDetailModal from '../components/CampaignDetailModal';
@@ -10,6 +11,7 @@ import type { Campaign } from '../data/campaigns';
 import { campaignsData } from '../data/campaigns';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'Active' | 'Inactive'>('all');
   const [sortKey, setSortKey] = useState<'newest' | 'oldest' | 'alpha'>('newest');
@@ -38,9 +40,14 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <NavBar onUploadClick={() => console.log('Upload modal')} />
+      <NavBar onUploadClick={() => navigate('/campaign')} />
 
       <Container maxWidth={false} sx={{ width: '95%', mt: 4, mx: 'auto' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h4">Dashboard</Typography>
+          <Button variant="contained" onClick={() => navigate('/campaign')}>Create Campaign</Button>
+        </Box>
+
         <CampaignControls
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
