@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Container, Grid, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,8 +7,8 @@ import CampaignDetailModal from '../components/CampaignDetailModal';
 import CampaignControls from '../components/CampaignControls';
 import NavBar from '../components/NavBar';
 
-import type { Campaign } from '../data/campaigns';
-import { campaignsData } from '../data/campaigns';
+import type { Campaign as ApiCampaign } from '../api/campaign';
+import { getAllCampaigns } from '../api/campaign';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -16,27 +16,49 @@ const Dashboard: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'Active' | 'Inactive'>('all');
   const [sortKey, setSortKey] = useState<'newest' | 'oldest' | 'alpha'>('newest');
 
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [campaigns, setCampaigns] = useState<ApiCampaign[]>([]);
+  const [selectedCampaign, setSelectedCampaign] = useState<ApiCampaign | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openDetails = (campaign: Campaign) => {
+  const openDetails = (campaign: ApiCampaign) => {
     setSelectedCampaign(campaign);
     setIsModalOpen(true);
   };
 
   const filtered = useMemo(() => {
-    return campaignsData
-      .filter((c) => (filterStatus === 'all' ? true : c.status === filterStatus))
+    return campaigns
+      .filter((c) => (filterStatus === 'all' ? true : (filterStatus === 'Active' ? c.isActive : !c.isActive)))
       .filter((c) => c.title.toLowerCase().includes(searchTerm.toLowerCase()))
       .sort((a, b) => {
         if (sortKey === 'alpha') return a.title.localeCompare(b.title);
 
-        const dateA = new Date(a.uploaded).getTime();
-        const dateB = new Date(b.uploaded).getTime();
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
 
         return sortKey === 'newest' ? dateB - dateA : dateA - dateB;
       });
-  }, [searchTerm, sortKey, filterStatus]);
+  }, [searchTerm, sortKey, filterStatus, campaigns]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        const res = await getAllCampaigns();
+        if (!mounted) return;
+
+        setCampaigns(res);
+      } catch (err) {
+        console.log(err)
+      }
+    };
+
+    load();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <>
