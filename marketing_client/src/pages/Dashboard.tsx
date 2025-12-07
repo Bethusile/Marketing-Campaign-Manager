@@ -72,7 +72,7 @@ const Dashboard: React.FC = () => {
           setFilterStatus={setFilterStatus}
           sortKey={sortKey}
           setSortKey={setSortKey}
-          onUploadClick={() => navigate('/campaign')}
+          onUploadClick={() => navigate('/campaign/new')}
         />
 
         <Box

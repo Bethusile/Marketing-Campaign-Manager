@@ -1,5 +1,6 @@
 // Created by Bethusile Mafumana :
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Modal,
   Box,
@@ -24,6 +25,7 @@ interface CampaignDetailModalProps {
 
 const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, open, onClose }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   if (!campaign) return null;
 
   const isLight = theme.palette.mode === 'light';
@@ -42,6 +44,7 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
 
   const handleEdit = () => {
     onClose();
+    navigate(`/campaign/${campaign.id}`);
   };
 
   return (
