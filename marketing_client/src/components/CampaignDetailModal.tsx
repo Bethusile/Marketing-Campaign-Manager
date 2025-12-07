@@ -13,7 +13,7 @@ import {
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import type { Campaign } from '../data/campaigns';
+import type { Campaign } from '../api/campaign';
 import { StyledModalBox } from '../styles/sharedStyles';
 import { ACCENT_RED } from '../styles/themeConstants';
 
@@ -28,9 +28,18 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
   if (!campaign) return null;
 
   const isLight = theme.palette.mode === 'light';
+  const baseUrl = import.meta.env.VITE_SERVER_URL ?? '';
+
+  const resolvePath = (p?: string | null) => {
+    if (!p) return undefined;
+    if (p.startsWith('http://') || p.startsWith('https://')) return p;
+    const pathToUse = p.startsWith('/') ? p : `/${p}`;
+    if (baseUrl.endsWith('/') && pathToUse.startsWith('/')) return `${baseUrl.slice(0, -1)}${pathToUse}`;
+    if (!baseUrl.endsWith('/') && !pathToUse.startsWith('/')) return `${baseUrl}/${pathToUse}`;
+    return `${baseUrl}${pathToUse}`;
+  };
 
   const handleEdit = () => {
-    console.log(`[ACTION] Editing campaign: ${campaign.title}`);
     onClose();
   };
 
@@ -57,7 +66,7 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
           <Grid sx={{ width: { xs: '100%', md: '50%' } }}>
             <CardMedia
               component="img"
-              image={campaign.imageSrc}
+              image={resolvePath(campaign.overlay_url) || resolvePath(campaign.target_url) || 'https://placehold.co/600x450/333333/ffffff?text=Image+Error'}
               alt={campaign.title}
               sx={{
                 borderRadius: 2,
@@ -74,12 +83,12 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
 
           <Grid sx={{ width: { xs: '100%', md: '50%' } }}>
             <Chip
-              label={campaign.status}
+              label={campaign.isActive ? 'Active' : 'Inactive'}
               size="medium"
               sx={{
                 fontWeight: 'bold',
                 fontSize: '1rem',
-                backgroundColor: campaign.status === 'Active' ? '#10b981' : '#f87171',
+                backgroundColor: campaign.isActive ? '#10b981' : '#f87171',
                 color: 'white',
                 px: 1,
                 py: 0.5,
@@ -92,7 +101,7 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
               Uploaded
             </Typography>
             <Typography variant="subtitle1" fontWeight="bold">
-              {campaign.uploaded}
+              {campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
             </Typography>
 
             <Divider sx={{ my: 2, borderColor: isLight ? '#ccc' : 'rgba(255,255,255,0.1)' }} />
@@ -101,7 +110,7 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
               Expires
             </Typography>
             <Typography variant="subtitle1" fontWeight="bold">
-              {campaign.expires}
+              No Expiry
             </Typography>
 
             <Divider sx={{ my: 2, borderColor: isLight ? '#ccc' : 'rgba(255,255,255,0.1)' }} />
