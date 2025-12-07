@@ -74,7 +74,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image
   };
 
   return (
-    <Box sx={{ maxWidth: 500, mx: 'auto', mt: 2 }}>
+    <Box sx={{ width: '100%', mt: 2 }}>
       
       {/* 1. Drag & Drop Zone */}
       {!selectedFile && (

@@ -58,36 +58,44 @@ const Campaign: React.FC = () => {
   return (
     <>
       <NavBar />
-      <Container className="header">
-        <Typography variant="h5" component="section" gutterBottom>
-          Campaign
-        </Typography>
-      </Container>
 
-      <Container>
-        <Dropdown label={'Status'} value={status} options={statusOptions} onChange={handleChange} />
-        <Input label="Title" required value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Input label="Message" required multiline rows={5} value={message} onChange={(e) => setMessage(e.target.value)} />
-        <Input label="URL" required value={buttonUrl} onChange={(e) => setButtonUrl(e.target.value)} />
-      </Container>
-
-      <Container className="campaignUpload">
-        <UploadFile onFileSelect={(f) => setRedactedFile(f)} fileType="Overlay" />
-        <UploadFile onFileSelect={(f) => setUnredactedFile(f)} fileType="Target" />
-      </Container>
-
-      <Container>
-        <Input label="Comment" value={comments} onChange={(e) => setComments(e.target.value)} />
-      </Container>
-
-      <Container>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button label="Upload Campaign" onClick={handleUploadCampaign} loading={loading} />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Header with back button */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Typography variant="h5" component="section">
+            Create New Campaign
+          </Typography>
           <MuiButton variant="outlined" onClick={() => navigate('/dashboard')}>Back to Dashboard</MuiButton>
+        </Box>
+
+        {/* Main form */}
+        <Box sx={{ display: 'grid', gap: 2 }}>
+          <Dropdown label={'Status'} value={status} options={statusOptions} onChange={handleChange} />
+          <Input label="Title" required value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Input label="Message" required multiline rows={5} value={message} onChange={(e) => setMessage(e.target.value)} />
+          <Input label="URL" required value={buttonUrl} onChange={(e) => setButtonUrl(e.target.value)} />
+
+          {/* Uploads: side-by-side on md+, stacked on xs */}
+          <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' }, mt: 1 }}>
+            <Box sx={{ flex: 1 }}>
+              <UploadFile onFileSelect={(f) => setRedactedFile(f)} fileType="Overlay" />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <UploadFile onFileSelect={(f) => setUnredactedFile(f)} fileType="Target" />
+            </Box>
+          </Box>
+
+          <Input label="Comment" value={comments} onChange={(e) => setComments(e.target.value)} />
+
+          {/* Actions */}
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 1 }}>
+            <Button label="Upload Campaign" onClick={handleUploadCampaign} loading={loading} />
+            <MuiButton variant="outlined" onClick={() => navigate('/dashboard')}>Cancel</MuiButton>
+          </Box>
         </Box>
       </Container>
     </>
   );
-};
+    };
 
-export default Campaign;
+    export default Campaign;
