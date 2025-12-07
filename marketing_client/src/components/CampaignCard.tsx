@@ -95,14 +95,11 @@ const CampaignCard: React.FC<Props> = ({ campaign, onCardClick }) => {
       </Box>
 
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" fontWeight="bold" color={isLight ? 'black' : 'white'}>
+        <Typography variant="h6" fontWeight="bold" color={isLight ? 'black' : 'white'} sx={{ textTransform: 'capitalize' }}>
           {campaign.title}
         </Typography>
         <Typography color={isLight ? '#333' : '#ccc'}>
           Uploaded: {campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
-        </Typography>
-        <Typography color={isLight ? '#333' : '#ccc'}>
-          Expires: No Expiry
         </Typography>
       </CardContent>
     </GlassCard>

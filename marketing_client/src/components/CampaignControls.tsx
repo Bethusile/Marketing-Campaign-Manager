@@ -1,9 +1,10 @@
 // Created by Bethusile Mafumana :
 import React from 'react';
 import {
-  Box, Select, MenuItem, TextField, InputAdornment, useTheme
+  Box, Select, MenuItem, TextField, InputAdornment, useTheme, Button
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 import { ACCENT_RED } from '../styles/themeConstants';
 
@@ -14,12 +15,14 @@ interface Props {
   setFilterStatus: (v: 'all' | 'Active' | 'Inactive') => void;
   sortKey: 'newest' | 'oldest' | 'alpha';
   setSortKey: (v: 'newest' | 'oldest' | 'alpha') => void;
+  onUploadClick?: () => void;
 }
 
 const CampaignControls: React.FC<Props> = ({
   searchTerm, setSearchTerm,
   filterStatus, setFilterStatus,
-  sortKey, setSortKey
+  sortKey, setSortKey,
+  onUploadClick
 }) => {
   const theme = useTheme();
   const isLight = theme.palette.mode === 'light';
@@ -29,12 +32,12 @@ const CampaignControls: React.FC<Props> = ({
   const borderColor = ACCENT_RED;
 
   return (
-    <Box display="flex" flexWrap="wrap" gap={2} my={4}>
+    <Box display="flex" flexWrap="wrap" gap={2} my={4} alignItems="center">
       <TextField
         placeholder="Search campaigns..."
-        fullWidth
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        sx={{ flex: '1 1 360px' }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -56,7 +59,8 @@ const CampaignControls: React.FC<Props> = ({
         sx={{
           color: textColor,
           background: bgColor,
-          borderRadius: '50px'
+          borderRadius: '50px',
+          minWidth: 140
         }}
       >
         <MenuItem value="all">All Status</MenuItem>
@@ -70,13 +74,20 @@ const CampaignControls: React.FC<Props> = ({
         sx={{
           color: textColor,
           background: bgColor,
-          borderRadius: '50px'
+          borderRadius: '50px',
+          minWidth: 140
         }}
       >
         <MenuItem value="newest">Newest</MenuItem>
         <MenuItem value="oldest">Oldest</MenuItem>
         <MenuItem value="alpha">Alphabetical</MenuItem>
       </Select>
+
+      {onUploadClick && (
+        <Button variant="contained" startIcon={<CloudUploadIcon />} onClick={onUploadClick} sx={{ bgcolor: ACCENT_RED }}>
+          Upload Campaign
+        </Button>
+      )}
     </Box>
   );
 };
