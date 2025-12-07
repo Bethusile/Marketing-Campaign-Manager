@@ -1,7 +1,6 @@
-// Created by Bethusile Mafumana : 
 import React, { useMemo, useState } from 'react';
-import { Container } from '@mui/material';
-import { Grid } from '@mui/material';
+import { Container, Grid, Button, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import CampaignCard from '../components/CampaignCard';
 import CampaignDetailModal from '../components/CampaignDetailModal';
@@ -12,6 +11,7 @@ import type { Campaign } from '../data/campaigns';
 import { campaignsData } from '../data/campaigns';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'Active' | 'Inactive'>('all');
   const [sortKey, setSortKey] = useState<'newest' | 'oldest' | 'alpha'>('newest');
@@ -26,14 +26,8 @@ const Dashboard: React.FC = () => {
 
   const filtered = useMemo(() => {
     return campaignsData
-      .filter((c) =>
-        filterStatus === 'all'
-          ? true
-          : c.status === filterStatus
-      )
-      .filter((c) =>
-        c.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      .filter((c) => (filterStatus === 'all' ? true : c.status === filterStatus))
+      .filter((c) => c.title.toLowerCase().includes(searchTerm.toLowerCase()))
       .sort((a, b) => {
         if (sortKey === 'alpha') return a.title.localeCompare(b.title);
 
@@ -46,27 +40,31 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <NavBar onUploadClick={() => console.log('Upload modal')} />
+      <NavBar onUploadClick={() => navigate('/campaign')} />
 
       <Container maxWidth={false} sx={{ width: '95%', mt: 4, mx: 'auto' }}>
-  <CampaignControls
-    searchTerm={searchTerm}
-    setSearchTerm={setSearchTerm}
-    filterStatus={filterStatus}
-    setFilterStatus={setFilterStatus}
-    sortKey={sortKey}
-    setSortKey={setSortKey}
-  />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h4">Dashboard</Typography>
+          <Button variant="contained" onClick={() => navigate('/campaign')}>Create Campaign</Button>
+        </Box>
 
-  <Grid container spacing={3}>
-    {filtered.map((campaign) => (
-      <Grid key={campaign.id} sx={{ width: { xs: '100%', sm: '50%', md: '32%' } }}>
-        <CampaignCard campaign={campaign} onCardClick={openDetails} />
-      </Grid>
-    ))}
-  </Grid>
-</Container>
+        <CampaignControls
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterStatus={filterStatus}
+          setFilterStatus={setFilterStatus}
+          sortKey={sortKey}
+          setSortKey={setSortKey}
+        />
 
+        <Grid container spacing={3}>
+          {filtered.map((campaign) => (
+            <Grid key={campaign.id} sx={{ width: { xs: '100%', sm: '50%', md: '32%' } }}>
+              <CampaignCard campaign={campaign} onCardClick={openDetails} />
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
 
       <CampaignDetailModal
         campaign={selectedCampaign}

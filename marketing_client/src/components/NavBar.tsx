@@ -1,4 +1,3 @@
-// Created by Bethusile Mafumana :  src/components/NavBar/NavBar.tsx
 import React, { useState, useEffect } from 'react';
 import {
   AppBar,
@@ -16,21 +15,22 @@ import {
   Container,
   styled,
   useMediaQuery,
-  
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useNavigate } from 'react-router-dom';
 
 import { LOGO_WHITE, LOGO_RED, LOGO_BLACK, ACCENT_RED, DARK_BG } from '../styles/themeConstants';
 
 interface NavBarProps {
-  onUploadClick: () => void;
+  onUploadClick?: () => void;
 }
 
 const NavBar: React.FC<NavBarProps> = ({ onUploadClick }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
 
   const prefersLightMode = useMediaQuery('(prefers-color-scheme: light)');
 
@@ -58,47 +58,44 @@ const NavBar: React.FC<NavBarProps> = ({ onUploadClick }) => {
   };
 
   const getUploadBtnColor = () => {
-    if (scrolled) return 'black'; // Black on scroll for both dark and light modes
-    return ACCENT_RED;            // Original red when not scrolled
+    if (scrolled) return 'black';
+    return ACCENT_RED;
   };
 
-  const GlassAppBar = styled(AppBar)({
+  const GlassAppBar = styled(AppBar)(() => ({
     backgroundColor: getAppBarBg(),
     boxShadow: scrolled ? '0 4px 10px rgba(0,0,0,0.5)' : 'none',
     transition: 'background-color 0.3s, box-shadow 0.3s',
     top: 0,
     zIndex: 1100,
-  });
+  }));
 
-const drawer = (
-  <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', height: '100%' }}>
-    <Box sx={{ p: 2 }}>
-      <img src={getLogo()} alt="Logo" style={{ height: 30 }} />
+  const handleUpload = () => {
+    if (onUploadClick) return onUploadClick();
+    navigate('/campaign');
+  };
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', height: '100%' }}>
+      <Box sx={{ p: 2 }}>
+        <img src={getLogo()} alt="Logo" style={{ height: 30 }} />
+      </Box>
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton sx={{ color: prefersLightMode ? 'black' : 'white' }} onClick={handleUpload}>
+            <CloudUploadIcon sx={{ mr: 1, color: ACCENT_RED }} />
+            <ListItemText primary="Upload Campaign" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton sx={{ color: prefersLightMode ? 'black' : 'white' }}>
+            <AccountCircleIcon sx={{ mr: 1, color: prefersLightMode ? 'black' : 'white' }} />
+            <ListItemText primary="John Doe" secondary="Current User" />
+          </ListItemButton>
+        </ListItem>
+      </List>
     </Box>
-    <List>
-      <ListItem disablePadding>
-        <ListItemButton 
-          sx={{ color: prefersLightMode ? 'black' : 'white' }} 
-          onClick={onUploadClick}
-        >
-          <CloudUploadIcon sx={{ mr: 1, color: ACCENT_RED }} />
-          <ListItemText primary="Upload Campaign" />
-        </ListItemButton>
-      </ListItem>
-      <ListItem disablePadding>
-        <ListItemButton sx={{ color: prefersLightMode ? 'black' : 'white' }}>
-          <AccountCircleIcon sx={{ mr: 1, color: prefersLightMode ? 'black' : 'white' }} />
-          <ListItemText 
-            primary="John Doe" 
-            secondary="Current User" 
-            sx={{ '& .MuiListItemText-secondary': { color: prefersLightMode ? 'grey.700' : 'grey' } }}
-          />
-        </ListItemButton>
-      </ListItem>
-    </List>
-  </Box>
-);
-
+  );
 
   return (
     <>
@@ -106,7 +103,6 @@ const drawer = (
       <GlassAppBar position="fixed">
         <Container maxWidth="lg">
           <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-            {/* Logo and Title */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img src={getLogo()} alt="Logo" style={{ height: 30, marginRight: 8 }} />
               <Typography variant="h6" fontWeight="bold" sx={{ color: getTextColor() }}>
@@ -114,18 +110,12 @@ const drawer = (
               </Typography>
             </Box>
 
-            {/* Desktop Actions */}
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
               <Button
                 variant="contained"
                 startIcon={<CloudUploadIcon />}
-                onClick={onUploadClick}
-                sx={{
-                  bgcolor: getUploadBtnColor(),
-                  color: 'white',
-                  '&:hover': { bgcolor: '#333' },
-                  mr: 2,
-                }}
+                onClick={handleUpload}
+                sx={{ bgcolor: getUploadBtnColor(), color: 'white', '&:hover': { bgcolor: '#333' }, mr: 2 }}
               >
                 Upload Campaign
               </Button>
@@ -133,43 +123,27 @@ const drawer = (
               <AccountCircleIcon sx={{ fontSize: 32, color: getTextColor() }} />
             </Box>
 
-            {/* Mobile Hamburger */}
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ display: { md: 'none' } }}
-            >
+            <IconButton color="inherit" aria-label="open drawer" edge="start" onClick={handleDrawerToggle} sx={{ display: { md: 'none' } }}>
               <MenuIcon sx={{ color: getTextColor() }} />
             </IconButton>
           </Toolbar>
         </Container>
       </GlassAppBar>
 
-      {/* Mobile Drawer */}
-      <nav>
-        // Inside NavBar component, replace the Drawer JSX with this:
-<Drawer
-  variant="temporary"
-  open={mobileOpen}
-  onClose={handleDrawerToggle}
-  ModalProps={{ keepMounted: true }}
-  sx={{
-    display: { xs: 'block', md: 'none' },
-    '& .MuiDrawer-paper': {
-      width: '80%',
-      maxWidth: 300,
-      bgcolor: prefersLightMode ? '#fff' : DARK_BG, // Light mode = white, dark mode = black
-    },
-  }}
->
-  {drawer}
-</Drawer>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': { width: '80%', maxWidth: 300, bgcolor: prefersLightMode ? '#fff' : DARK_BG },
+        }}
+      >
+        {drawer}
+      </Drawer>
 
-      </nav>
-
-      <Toolbar /> {/* Spacer */}
+      <Toolbar />
     </>
   );
 };
