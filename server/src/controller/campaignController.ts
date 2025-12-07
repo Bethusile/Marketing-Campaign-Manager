@@ -58,6 +58,7 @@ interface CampaignData {
   button_url: string;
   overlay_url: string;
   target_url: string;
+  isActive: boolean;
 }
 
 interface MulterUploadedFile {
@@ -88,6 +89,9 @@ export const postCampaign = async (
     }
     const overlay_url = overlayFile ? `/uploads/${overlayFile.filename}` : '';
     const target_url = targetFile ? `/uploads/${targetFile.filename}` : '';
+    const isActiveRaw = req.body.isActive;
+    const isActive = (typeof isActiveRaw === 'string') ? (isActiveRaw.toLowerCase() === 'true') : Boolean(isActiveRaw);
+
     const campaignData: CampaignData = {
       title: req.body.title,
       message: req.body.message,
@@ -95,6 +99,7 @@ export const postCampaign = async (
       button_url: req.body.button_url,
       overlay_url,
       target_url,
+      isActive,
     };
     const campaign = await Campaign.create({ ...campaignData });
     res.status(201).json(campaign);
@@ -122,6 +127,10 @@ export const updateCampaign = async (
       comments: req.body.comments,
       button_url: req.body.button_url,
     };
+    if (req.body.isActive !== undefined) {
+      const raw = req.body.isActive;
+      updateData.isActive = (typeof raw === 'string') ? (raw.toLowerCase() === 'true') : Boolean(raw);
+    }
     if (overlayFile) updateData.overlay_url = `/uploads/${overlayFile.filename}`;
     if (targetFile) updateData.target_url = `/uploads/${targetFile.filename}`;
     const [affectedRows] = await Campaign.update({ ...updateData }, {
