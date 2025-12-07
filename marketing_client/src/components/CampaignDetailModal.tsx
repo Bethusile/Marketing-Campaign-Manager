@@ -9,7 +9,6 @@ import {
   Chip,
   Button,
   CardMedia,
-  Grid,
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -39,6 +38,8 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
     return `${baseUrl}${pathToUse}`;
   };
 
+  const buttonUrl = campaign.button_url ?? null;
+
   const handleEdit = () => {
     onClose();
   };
@@ -47,23 +48,27 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
     <Modal open={open} onClose={onClose}>
       <StyledModalBox
         sx={{
+          width: { xs: '95%', sm: '90%', md: 900 },
           bgcolor: isLight ? '#fff' : theme.palette.background.paper,
           color: isLight ? '#111' : '#fff',
+          maxHeight: '90vh',
+          overflowY: 'auto',
         }}
       >
         {/* Header */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} sx={{ gap: 2, flexWrap: 'wrap' }}>
           <Typography variant="h5" fontWeight="bold">
             {campaign.title}
+          </Typography>
+          <Typography variant="body2" color={isLight ? '#555' : '#ccc'}>
+            Uploaded: {campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
           </Typography>
           <IconButton onClick={onClose} sx={{ color: ACCENT_RED }}>
             <CloseIcon fontSize="large" />
           </IconButton>
         </Box>
-
-        {/* Grid for Image & Details */}
-        <Grid container spacing={3}>
-          <Grid sx={{ width: { xs: '100%', md: '50%' } }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+          <Box sx={{ flex: '1 1 50%', minWidth: 0 }}>
             <CardMedia
               component="img"
               image={resolvePath(campaign.overlay_url) || resolvePath(campaign.target_url) || 'https://placehold.co/600x450/333333/ffffff?text=Image+Error'}
@@ -72,65 +77,76 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
                 borderRadius: 2,
                 width: '100%',
                 height: 'auto',
-                maxHeight: 300,
+                maxHeight: { xs: 240, md: 360 },
                 objectFit: 'cover',
               }}
               onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                 e.currentTarget.src = 'https://placehold.co/600x450/333333/ffffff?text=Image+Error';
               }}
             />
-          </Grid>
+          </Box>
 
-          <Grid sx={{ width: { xs: '100%', md: '50%' } }}>
-            <Chip
-              label={campaign.isActive ? 'Active' : 'Inactive'}
-              size="medium"
-              sx={{
-                fontWeight: 'bold',
-                fontSize: '1rem',
-                backgroundColor: campaign.isActive ? '#10b981' : '#f87171',
-                color: 'white',
-                px: 1,
-                py: 0.5,
-              }}
-            />
-
-            <Divider sx={{ my: 2, borderColor: isLight ? '#ccc' : 'rgba(255,255,255,0.1)' }} />
-
-            <Typography variant="body2" color={isLight ? '#555' : '#ccc'}>
-              Uploaded
-            </Typography>
-            <Typography variant="subtitle1" fontWeight="bold">
-              {campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
-            </Typography>
+          <Box sx={{ flex: '1 1 50%', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+              <Chip
+                label={campaign.isActive ? 'Active' : 'Inactive'}
+                size="medium"
+                sx={{
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  backgroundColor: campaign.isActive ? '#10b981' : '#f87171',
+                  color: 'white',
+                  px: 1,
+                  py: 0.5,
+                }}
+              />
+              <Typography variant="body2" color={isLight ? '#555' : '#ccc'}>
+                Last updated: {campaign.updatedAt ? new Date(campaign.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
+              </Typography>
+            </Box>
 
             <Divider sx={{ my: 2, borderColor: isLight ? '#ccc' : 'rgba(255,255,255,0.1)' }} />
 
-            <Typography variant="body2" color={isLight ? '#555' : '#ccc'}>
-              Expires
-            </Typography>
-            <Typography variant="subtitle1" fontWeight="bold">
-              No Expiry
-            </Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr' }, gap: 2 }}>
+              <Box>
+                <Typography variant="body2" color={isLight ? '#555' : '#ccc'}>
+                  Message
+                </Typography>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', color: isLight ? '#111' : '#fff' }}>
+                  {campaign.message || '—'}
+                </Typography>
+              </Box>
 
-            <Divider sx={{ my: 2, borderColor: isLight ? '#ccc' : 'rgba(255,255,255,0.1)' }} />
+              <Box>
+                <Typography variant="body2" color={isLight ? '#555' : '#ccc'}>
+                  Comments
+                </Typography>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', color: isLight ? '#111' : '#fff' }}>
+                  {campaign.comments || '—'}
+                </Typography>
+              </Box>
 
-            <Typography variant="body2" color={isLight ? '#555' : '#ccc'} mb={0.5}>
-              Campaign URL
-            </Typography>
-            <Typography
-              component="a"
-              href={`https://example.com/ar-scan/${campaign.id}`}
-              sx={{
-                color: ACCENT_RED,
-                fontWeight: 'semibold',
-                textDecoration: 'none',
-              }}
-            >
-              https://example.com/ar-scan/{campaign.id}
-            </Typography>
-          </Grid>
-        </Grid>
+              <Box>
+                <Typography variant="body2" color={isLight ? '#555' : '#ccc'} mb={0.5}>
+                  Button Link
+                </Typography>
+                {buttonUrl ? (
+                  <Typography
+                    component="a"
+                    href={buttonUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    sx={{ color: ACCENT_RED, textDecoration: 'underline', wordBreak: 'break-all' }}
+                  >
+                    {buttonUrl}
+                  </Typography>
+                ) : (
+                  <Typography variant="body1" color={isLight ? '#111' : '#fff'}>—</Typography>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        </Box>
 
         {/* Actions */}
         <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
