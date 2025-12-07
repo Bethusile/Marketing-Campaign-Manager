@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Container, Grid, Button, Box, Typography } from '@mui/material';
+import { Container, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import CampaignCard from '../components/CampaignCard';
@@ -62,14 +62,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <NavBar onUploadClick={() => navigate('/campaign')} />
+      <NavBar />
 
-      <Container maxWidth={false} sx={{ width: '95%', mt: 4, mx: 'auto' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h4">Dashboard</Typography>
-          <Button variant="contained" onClick={() => navigate('/campaign')}>Create Campaign</Button>
-        </Box>
-
+      <Container maxWidth={false} sx={{ mt: 4, px: 2 }}>
         <CampaignControls
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -77,15 +72,29 @@ const Dashboard: React.FC = () => {
           setFilterStatus={setFilterStatus}
           sortKey={sortKey}
           setSortKey={setSortKey}
+          onUploadClick={() => navigate('/campaign/new')}
         />
 
-        <Grid container spacing={3}>
+        <Box
+          component="section"
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(3, 1fr)',
+              lg: 'repeat(4, 1fr)'
+            },
+            alignItems: 'stretch'
+          }}
+        >
           {filtered.map((campaign) => (
-            <Grid key={campaign.id} sx={{ width: { xs: '100%', sm: '50%', md: '32%' } }}>
+            <Box key={campaign.id} sx={{ width: '100%' }}>
               <CampaignCard campaign={campaign} onCardClick={openDetails} />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
 
       <CampaignDetailModal

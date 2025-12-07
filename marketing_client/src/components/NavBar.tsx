@@ -4,7 +4,6 @@ import {
   Toolbar,
   Box,
   Typography,
-  Button,
   IconButton,
   Drawer,
   List,
@@ -17,20 +16,14 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { useNavigate } from 'react-router-dom';
 
 import { LOGO_WHITE, LOGO_RED, LOGO_BLACK, ACCENT_RED, DARK_BG } from '../styles/themeConstants';
 
-interface NavBarProps {
-  onUploadClick?: () => void;
-}
-
-const NavBar: React.FC<NavBarProps> = ({ onUploadClick }) => {
+const NavBar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate();
+  
 
   const prefersLightMode = useMediaQuery('(prefers-color-scheme: light)');
 
@@ -57,10 +50,6 @@ const NavBar: React.FC<NavBarProps> = ({ onUploadClick }) => {
     return scrolled ? LOGO_RED : LOGO_WHITE;
   };
 
-  const getUploadBtnColor = () => {
-    if (scrolled) return 'black';
-    return ACCENT_RED;
-  };
 
   const GlassAppBar = styled(AppBar)(() => ({
     backgroundColor: getAppBarBg(),
@@ -70,23 +59,12 @@ const NavBar: React.FC<NavBarProps> = ({ onUploadClick }) => {
     zIndex: 1100,
   }));
 
-  const handleUpload = () => {
-    if (onUploadClick) return onUploadClick();
-    navigate('/campaign');
-  };
-
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', height: '100%' }}>
       <Box sx={{ p: 2 }}>
         <img src={getLogo()} alt="Logo" style={{ height: 30 }} />
       </Box>
       <List>
-        <ListItem disablePadding>
-          <ListItemButton sx={{ color: prefersLightMode ? 'black' : 'white' }} onClick={handleUpload}>
-            <CloudUploadIcon sx={{ mr: 1, color: ACCENT_RED }} />
-            <ListItemText primary="Upload Campaign" />
-          </ListItemButton>
-        </ListItem>
         <ListItem disablePadding>
           <ListItemButton sx={{ color: prefersLightMode ? 'black' : 'white' }}>
             <AccountCircleIcon sx={{ mr: 1, color: prefersLightMode ? 'black' : 'white' }} />
@@ -111,14 +89,6 @@ const NavBar: React.FC<NavBarProps> = ({ onUploadClick }) => {
             </Box>
 
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-              <Button
-                variant="contained"
-                startIcon={<CloudUploadIcon />}
-                onClick={handleUpload}
-                sx={{ bgcolor: getUploadBtnColor(), color: 'white', '&:hover': { bgcolor: '#333' }, mr: 2 }}
-              >
-                Upload Campaign
-              </Button>
               <Typography sx={{ color: getTextColor(), mr: 1.5 }}>John Doe</Typography>
               <AccountCircleIcon sx={{ fontSize: 32, color: getTextColor() }} />
             </Box>
