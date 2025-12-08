@@ -14,18 +14,20 @@ import {
   Container,
   styled,
   useMediaQuery,
+  Button
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import { LOGO_WHITE, LOGO_RED, LOGO_BLACK, ACCENT_RED, DARK_BG } from '../styles/themeConstants';
+import { useNavigate } from 'react-router-dom';
 
 const NavBar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  
 
   const prefersLightMode = useMediaQuery('(prefers-color-scheme: light)');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -50,7 +52,6 @@ const NavBar: React.FC = () => {
     return scrolled ? LOGO_RED : LOGO_WHITE;
   };
 
-
   const GlassAppBar = styled(AppBar)(() => ({
     backgroundColor: getAppBarBg(),
     boxShadow: scrolled ? '0 4px 10px rgba(0,0,0,0.5)' : 'none',
@@ -59,16 +60,29 @@ const NavBar: React.FC = () => {
     zIndex: 1100,
   }));
 
+  // -----------------------------
+  // HANDLERS YOU REQUESTED
+  // -----------------------------
+  const goToDashboard = () => navigate('/dashboard');
+  const logout = () => navigate('/login');
+
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', height: '100%' }}>
       <Box sx={{ p: 2 }}>
-        <img src={getLogo()} alt="Logo" style={{ height: 30 }} />
+        <img src={getLogo()} alt="Logo" style={{ height: 30 }} onClick={goToDashboard} />
       </Box>
       <List>
         <ListItem disablePadding>
           <ListItemButton sx={{ color: prefersLightMode ? 'black' : 'white' }}>
             <AccountCircleIcon sx={{ mr: 1, color: prefersLightMode ? 'black' : 'white' }} />
             <ListItemText primary="John Doe" secondary="Current User" />
+          </ListItemButton>
+        </ListItem>
+
+        {/* LOGOUT BUTTON IN DRAWER */}
+        <ListItem disablePadding>
+          <ListItemButton onClick={logout}>
+            <ListItemText primary="Logout" sx={{ color: prefersLightMode ? 'black' : 'white' }} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -81,21 +95,46 @@ const NavBar: React.FC = () => {
       <GlassAppBar position="fixed">
         <Container maxWidth="lg">
           <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+
+            {/* CLICKABLE LOGO + TEXT */}
+            <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={goToDashboard}>
               <img src={getLogo()} alt="Logo" style={{ height: 30, marginRight: 8 }} />
               <Typography variant="h6" fontWeight="bold" sx={{ color: getTextColor() }}>
                 AR Manager
               </Typography>
             </Box>
 
+            {/* DESKTOP USER + LOGOUT */}
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
               <Typography sx={{ color: getTextColor(), mr: 1.5 }}>John Doe</Typography>
-              <AccountCircleIcon sx={{ fontSize: 32, color: getTextColor() }} />
+              <AccountCircleIcon sx={{ fontSize: 32, color: getTextColor(), mr: 2 }} />
+
+              {/* LOGOUT BUTTON */}
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={logout}
+                sx={{
+                  color: getTextColor(),
+                  borderColor: getTextColor(),
+                  '&:hover': { borderColor: getTextColor() },
+                }}
+              >
+                Logout
+              </Button>
             </Box>
 
-            <IconButton color="inherit" aria-label="open drawer" edge="start" onClick={handleDrawerToggle} sx={{ display: { md: 'none' } }}>
+            {/* MOBILE MENU ICON */}
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ display: { md: 'none' } }}
+            >
               <MenuIcon sx={{ color: getTextColor() }} />
             </IconButton>
+
           </Toolbar>
         </Container>
       </GlassAppBar>
