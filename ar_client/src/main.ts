@@ -5,6 +5,7 @@ import "./style.css";
 import { getActiveCampaignTargets } from "./services/api";
 import { initAR } from "./ar-setup";
 import { compileTargets } from "./utils/compiler";
+import { showErrorOnScreen } from "./components/ErrorBanner";
 
 declare global {
 	interface Window {
@@ -35,7 +36,10 @@ const render = async () => {
 
 		// `targets` is an array of { id, targetUrl } in the desired compilation order.
 		if (!targets || targets.length === 0) {
-			console.error("No active campaigns found");
+			console.warn("No active campaigns found — loading camera without targets");
+			if (app) app.style.display = "none";
+			// initialize camera-only mode: no compiler, no detectors/overlays
+			await initAR(undefined, []);
 			return;
 		}
 
@@ -57,9 +61,9 @@ const render = async () => {
 			console.error("Failed to compile targets:", err);
 			if (err instanceof Error && err.message.startsWith("Failed to load image:")) {
 				console.error("Image load failure details:", err);
-				alert(`Failed to load image for AR target. URL: ${err.message.replace("Failed to load image: ","")}.`);
+				showErrorOnScreen(`Failed to load image for AR target. URL: ${err.message.replace("Failed to load image: ","")}.`);
 			} else {
-				alert("Failed to initialize AR targets.");
+				showErrorOnScreen("Failed to initialize AR targets.");
 			}
 			return;
 		}
@@ -67,7 +71,11 @@ const render = async () => {
 
 		initAR(compiledMindUrl, campaignIds);
 	} catch (error) {
-		console.error(error);
+		if (error instanceof Error && (error.message === "Server error, could not fetch data" || error.message === "User error to fetch data")) {
+			showErrorOnScreen(error.message);
+		} else {
+			console.error(error);
+		}
 	}
 };
 

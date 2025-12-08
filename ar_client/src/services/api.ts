@@ -21,7 +21,7 @@ type RawCampaign = {
   created_at?: string;
 };
 
-const API_BASE_URL = (import.meta.env.VITE_SERVER_URL as string) || 'http://localhost:3000';
+const API_BASE_URL = (import.meta.env.VITE_SERVER_URL as string);
 
 export const getActiveCampaignTargets = async (): Promise<Array<{id: number; targetUrl: string;}>> => {
   try {
@@ -43,7 +43,7 @@ export const getActiveCampaignTargets = async (): Promise<Array<{id: number; tar
     return result;
   } catch (error) {
     console.error(error);
-    return [];
+    throw new Error("Server error, could not fetch data");
   }
 };
 
@@ -72,6 +72,6 @@ export const getCampaign = async (id: number,): Promise<Campaign | undefined> =>
     return campaign;
   } catch (error) {
     console.error(error);
-    return undefined;
+    throw new Error("User error to fetch data");
   }
 };
