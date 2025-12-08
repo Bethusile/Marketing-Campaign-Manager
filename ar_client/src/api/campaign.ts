@@ -1,7 +1,7 @@
 //JaysonBam
 //Function that call on apis for server information
 
-import type {Campaign} from "../types/index";
+import type { Campaign } from "../types/campaign";
 
 // TODO: fix db type
 type RawCampaign = {

@@ -1,7 +1,7 @@
 //JaysonBam
 //Compiles all target images to a sing mind target
 
-import type { MindAR } from "../types";
+import type { MindAR } from "../types/mindar";
 
 declare const MINDAR: MindAR;
 

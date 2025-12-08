@@ -1,6 +1,16 @@
-import type { AFrameEntity, AFrameComponent } from "./index";
+//types used for AFrame lib
 
-// Detail shape emitted by A-Frame when a material texture is loaded
+// Basic A-Frame entity/component surface used across the project
+export interface AFrameEntity extends HTMLElement {
+  components?: Record<string, unknown>;
+}
+
+export interface AFrameComponent {
+  el: AFrameEntity;
+  data?: Record<string, unknown>;
+}
+
+// Shape emitted when a material texture is loaded
 export interface MaterialTextureLoadedDetail {
   texture: {
     image: HTMLImageElement | {
@@ -35,5 +45,3 @@ declare global {
 }
 
 export type TexImage = HTMLImageElement | { naturalWidth?: number; naturalHeight?: number; width?: number; height?: number };
-
-export type { AFrameEntity, AFrameComponent };

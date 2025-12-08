@@ -4,7 +4,7 @@
 import { getCampaign } from "./api/campaign";
 import { createDropdownMessage } from "./components/DropdownMessage";
 import { showErrorOnScreen } from "./components/ErrorBanner";
-import type { AFrameEntity, AFrameComponent } from "./types";
+import type { AFrameEntity, AFrameComponent } from "./types/aframe";
 import type { AFrameStatic, MaterialTextureLoadedDetail, TexImage } from "./types/aframe";
 import { enforceHighQualityCamera, startCameraFallbackStream, stopCameraFallbackStream } from "./utils/camera";
 
