@@ -5,6 +5,14 @@ import type { MindAR } from "../types/mindar";
 
 declare const MINDAR: MindAR;
 
+class ErrorWithEvent extends Error {
+  event?: Event | ErrorEvent;
+  constructor(message?: string) {
+    super(message);
+    Object.setPrototypeOf(this, ErrorWithEvent.prototype);
+  }
+}
+
 const loadImage = (src: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const loadedImage = new Image();
@@ -17,10 +25,14 @@ const loadImage = (src: string): Promise<HTMLImageElement> =>
     }
     loadedImage.onload = () => resolve(loadedImage);
     loadedImage.onerror = (errorEvent) => {
-      type ErrorWithEvent = Error & { event?: Event | ErrorEvent | unknown };
-      const err = new Error(`Failed to load image: ${src}`) as ErrorWithEvent;
-      // attach original event for debugging (typed)
-      err.event = errorEvent as Event | ErrorEvent | unknown;
+      const err = new ErrorWithEvent(`Failed to load image: ${src}`);
+      // attach original event for debugging when it's an Event
+      if (errorEvent instanceof Event) {
+        err.event = errorEvent;
+      } else {
+        // append textual information when available
+        err.message = `${err.message} (${String(errorEvent)})`;
+      }
       reject(err);
     };
     loadedImage.src = src;
