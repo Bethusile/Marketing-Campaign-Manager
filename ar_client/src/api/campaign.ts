@@ -16,27 +16,6 @@ function normalizeToString(value: unknown): string | undefined {
   return undefined;
 }
 
-function isRawCampaign(obj: unknown): obj is {
-  id?: number | string;
-  title?: string;
-  message?: string;
-  buttonUrl?: string;
-  button_url?: string;
-  targetUrl?: string;
-  target_url?: string;
-  displayUrl?: string;
-  display_url?: string;
-  overlay_url?: string;
-  isActive?: boolean;
-  is_active?: boolean;
-  createdAt?: string;
-  created_at?: string;
-} {
-  if (!isObject(obj)) return false;
-  // minimal shape check: must have at least an id or target field
-  return ('id' in obj) || ('targetUrl' in obj) || ('target_url' in obj);
-}
-
 export const getActiveCampaignTargets = async (): Promise<Array<{id: number; targetUrl: string;}>> => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/getCampaign/active`);

@@ -49,26 +49,13 @@ export const registerComponents = () => {
           const texture = evt.detail?.texture;
           const textureImage = texture?.image ?? null;
           if (!textureImage) return;
-
-          // runtime-safe access: prefer naturalWidth/height, fallback to width/height
-          let width: number | undefined;
-          let height: number | undefined;
-          try {
-            // runtime-safe access: prefer naturalWidth/height, fallback to width/height
-            if (isTextureImageLike(textureImage)) {
-              if (typeof textureImage.naturalWidth === 'number') width = textureImage.naturalWidth;
-              else if (typeof textureImage.width === 'number') width = textureImage.width;
-              if (typeof textureImage.naturalHeight === 'number') height = textureImage.naturalHeight;
-              else if (typeof textureImage.height === 'number') height = textureImage.height;
-            }
-          } catch (_e) {
-            // ignore
-          }
-
+          let width = (textureImage as HTMLImageElement).naturalWidth;
+          let height = (textureImage as HTMLImageElement).naturalHeight;
           if (width && height) {
-            const ratio = height / width;
-            aImageEl.setAttribute("height", String(ratio));
-            aImageEl.setAttribute("width", "1");
+            const targetWidth = Number(element.getAttribute('width')) || 1;
+            aImageEl.setAttribute("width", String(targetWidth));
+            aImageEl.setAttribute("height", String(targetWidth * (height / width)));
+          } else {
           }
         });
       }
