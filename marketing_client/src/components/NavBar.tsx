@@ -60,16 +60,13 @@ const NavBar: React.FC = () => {
     zIndex: 1100,
   }));
 
-  // -----------------------------
-  // HANDLERS YOU REQUESTED
-  // -----------------------------
   const goToDashboard = () => navigate('/dashboard');
   const logout = () => navigate('/login');
 
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', height: '100%' }}>
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', height: '4rem' }}>
       <Box sx={{ p: 2 }}>
-        <img src={getLogo()} alt="Logo" style={{ height: 30 }} onClick={goToDashboard} />
+        <img src={getLogo()} alt="Logo" style={{ height: '4rem' }} onClick={goToDashboard} />
       </Box>
       <List>
         <ListItem disablePadding>
@@ -79,7 +76,6 @@ const NavBar: React.FC = () => {
           </ListItemButton>
         </ListItem>
 
-        {/* LOGOUT BUTTON IN DRAWER */}
         <ListItem disablePadding>
           <ListItemButton onClick={logout}>
             <ListItemText primary="Logout" sx={{ color: prefersLightMode ? 'black' : 'white' }} />
@@ -94,48 +90,81 @@ const NavBar: React.FC = () => {
       <CssBaseline />
       <GlassAppBar position="fixed">
         <Container maxWidth="lg">
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+          <Toolbar disableGutters>
 
-            {/* CLICKABLE LOGO + TEXT */}
-            <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={goToDashboard}>
-              <img src={getLogo()} alt="Logo" style={{ height: 30, marginRight: 8 }} />
-              <Typography variant="h6" fontWeight="bold" sx={{ color: getTextColor() }}>
-                AR Manager
-              </Typography>
-            </Box>
+  {/* LEFT — LOGO */}
+  <Box
+    sx={{
+      flex: 1,
+      display: 'flex',
+      alignItems: 'center',
+      cursor: 'pointer',
+    }}
+    onClick={goToDashboard}
+  >
+    <img
+      src={getLogo()}
+      alt="Logo"
+      style={{ height: '3.5rem', marginRight: 8 }}
+    />
+  </Box>
 
-            {/* DESKTOP USER + LOGOUT */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-              <Typography sx={{ color: getTextColor(), mr: 1.5 }}>John Doe</Typography>
-              <AccountCircleIcon sx={{ fontSize: 32, color: getTextColor(), mr: 2 }} />
+  {/* CENTER — TITLE */}
+  <Box
+    sx={{
+      flex: 1,
+      display: 'flex',
+      justifyContent: 'center',
+    }}
+  >
+    <Typography
+      variant="h5"
+      fontWeight="bold"
+      sx={{ color: getTextColor() }}
+    >
+      Campaign Manager
+    </Typography>
+  </Box>
 
-              {/* LOGOUT BUTTON */}
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={logout}
-                sx={{
-                  color: getTextColor(),
-                  borderColor: getTextColor(),
-                  '&:hover': { borderColor: getTextColor() },
-                }}
-              >
-                Logout
-              </Button>
-            </Box>
+  {/* RIGHT — USER + LOGOUT (DESKTOP) */}
+  <Box
+    sx={{
+      flex: 1,
+      display: { xs: 'none', md: 'flex' },
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+    }}
+  >
+    <Typography sx={{ color: getTextColor(), mr: 1.5 }}>John Doe</Typography>
+    <AccountCircleIcon sx={{ fontSize: 32, color: getTextColor(), mr: 2 }} />
 
-            {/* MOBILE MENU ICON */}
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ display: { md: 'none' } }}
-            >
-              <MenuIcon sx={{ color: getTextColor() }} />
-            </IconButton>
+    <Button
+      variant="outlined"
+      size="small"
+      onClick={logout}
+      sx={{
+        color: getTextColor(),
+        borderColor: getTextColor(),
+        '&:hover': { borderColor: getTextColor() },
+      }}
+    >
+      Logout
+    </Button>
+  </Box>
 
-          </Toolbar>
+  {/* MOBILE MENU BUTTON (still right side) */}
+  <IconButton
+    color="inherit"
+    aria-label="open drawer"
+    edge="end"
+    onClick={handleDrawerToggle}
+    sx={{ display: { md: 'none' } }}
+  >
+    <MenuIcon sx={{ color: getTextColor() }} />
+  </IconButton>
+
+</Toolbar>
+
         </Container>
       </GlassAppBar>
 

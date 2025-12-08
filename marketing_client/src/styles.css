@@ -106,9 +106,9 @@
 }
 
 .logo {
-  width: 180px;
-  max-width: 100%;
-  height: auto;
+  width: 4rem;
+  max-width: 4rem;
+  height: 2rem;
   display: block;
   margin: 0 auto 20px auto;
   border-radius: 0;
