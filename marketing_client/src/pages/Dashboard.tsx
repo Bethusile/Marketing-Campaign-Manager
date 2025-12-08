@@ -6,6 +6,7 @@ import CampaignCard from '../components/CampaignCard';
 import CampaignDetailModal from '../components/CampaignDetailModal';
 import CampaignControls from '../components/CampaignControls';
 import NavBar from '../components/NavBar';
+import Alert from '../components/alert'; // <-- IMPORT THE NEW ALERT COMPONENT
 
 import type { Campaign as ApiCampaign } from '../api/campaign';
 import { getAllCampaigns } from '../api/campaign';
@@ -19,6 +20,19 @@ const Dashboard: React.FC = () => {
   const [campaigns, setCampaigns] = useState<ApiCampaign[]>([]);
   const [selectedCampaign, setSelectedCampaign] = useState<ApiCampaign | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // 1. ADD STATE FOR ALERT MANAGEMENT
+  const [alertState, setAlertState] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    type: 'error' | 'success' | 'warning';
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    type: 'error',
+  });
 
   const openDetails = (campaign: ApiCampaign) => {
     setSelectedCampaign(campaign);
@@ -39,6 +53,7 @@ const Dashboard: React.FC = () => {
       });
   }, [searchTerm, sortKey, filterStatus, campaigns]);
 
+  // 2. UPDATE useEffect TO HANDLE THE API ERROR
   useEffect(() => {
     let mounted = true;
 
@@ -48,8 +63,20 @@ const Dashboard: React.FC = () => {
         if (!mounted) return;
 
         setCampaigns(res);
+        // Clear any previous error on success
+        setAlertState(prev => ({ ...prev, open: false })); 
+
       } catch (err) {
-        console.log(err)
+        console.error("Failed to fetch campaigns:", err);
+        if (!mounted) return;
+
+        // Show the error alert
+        setAlertState({
+          open: true,
+          title: 'Error: Failed to fetch campaigns',
+          message: 'Could not connect to the server. Please check your network connection and try again.',
+          type: 'error',
+        });
       }
     };
 
@@ -59,6 +86,10 @@ const Dashboard: React.FC = () => {
       mounted = false;
     };
   }, []);
+
+  const handleAlertClose = () => {
+    setAlertState(prev => ({ ...prev, open: false }));
+  };
 
   return (
     <>
@@ -101,6 +132,15 @@ const Dashboard: React.FC = () => {
         campaign={selectedCampaign}
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* 3. RENDER THE ALERT COMPONENT */}
+      <Alert
+        open={alertState.open}
+        onClose={handleAlertClose}
+        type={alertState.type}
+        title={alertState.title}
+        message={alertState.message}
       />
     </>
   );

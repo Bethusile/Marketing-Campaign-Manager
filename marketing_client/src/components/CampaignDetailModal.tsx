@@ -98,12 +98,12 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
               }}
             >
               <Typography variant="subtitle2" color={isLight ? '#333' : '#aaa'} mb={0.5}>
-                {imageUrl1 ? 'Image 1 (Overlay)' : 'Image 1 Not Found'}
+                {imageUrl1 ? 'Overlay Image' : 'Overlay Image Not Found'}
               </Typography>
               <CardMedia
                 component="img"
                 image={imageUrl1 || fallbackImage}
-                alt={`${campaign.title} Image 1`}
+                alt={`${campaign.title} Overlay Image`}
                 sx={{
                   borderRadius: 2,
                   width: '100%',
@@ -126,12 +126,12 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
               }}
             >
               <Typography variant="subtitle2" color={isLight ? '#333' : '#aaa'} mb={0.5}>
-                {imageUrl2 ? 'Image 2 (Target)' : 'Image 2 Not Found'}
+                {imageUrl2 ? 'Target Image' : 'Target Image Not Found'}
               </Typography>
               <CardMedia
                 component="img"
                 image={imageUrl2 || fallbackImage}
-                alt={`${campaign.title} Image 2`}
+                alt={`${campaign.title} Target Image`}
                 sx={{
                   borderRadius: 2,
                   width: '100%',
