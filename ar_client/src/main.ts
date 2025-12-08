@@ -4,7 +4,7 @@
 import "./style.css";
 import "./vendor/aframe.min.js";
 import "./vendor/mindar-image-aframe.prod.js";
-import { getActiveCampaignTargets } from "./services/api";
+import { getActiveCampaignTargets } from "./api/campaign.js";
 import { initAR } from "./ar-setup";
 import { compileTargets } from "./utils/compiler";
 import { showErrorOnScreen } from "./components/ErrorBanner";
@@ -18,16 +18,16 @@ declare global {
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
 const showLoading = (message = "Loading...") => {
-	const existing = document.getElementById("ar-loading");
-	if (existing) return () => existing.remove();
+ 	const existingLoadingEl = document.getElementById("ar-loading");
+ 	if (existingLoadingEl) return () => existingLoadingEl.remove();
 
-	const el = document.createElement("div");
-	el.id = "ar-loading";
-	el.innerText = message;
-	document.body.appendChild(el);
+	const loadingEl = document.createElement("div");
+	loadingEl.id = "ar-loading";
+	loadingEl.innerText = message;
+	document.body.appendChild(loadingEl);
 
 	return () => {
-		el.remove();
+		loadingEl.remove();
 	};
 };
 
@@ -45,12 +45,12 @@ const render = async () => {
 			return;
 		}
 
-		const campaignIds = targets.map((t) => t.id);
-		const targetImageUrls = targets.map((t) => t.targetUrl);
+		const campaignIds = targets.map((target) => target.id);
+		const targetImageUrls = targets.map((target) => target.targetUrl);
 
 		// Build explicit map: mindar targetIndex -> campaignId
 		const targetToCampaignMap: Record<number, number> = {};
-		campaignIds.forEach((id, idx) => { targetToCampaignMap[idx] = id; });
+	 	campaignIds.forEach((id, targetIndex) => { targetToCampaignMap[targetIndex] = id; });
 		// expose for runtime components to resolve targetIndex -> campaignId
 		window.__TARGET_TO_CAMPAIGN = targetToCampaignMap;
 

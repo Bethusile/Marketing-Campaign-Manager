@@ -8,16 +8,16 @@ export const createDropdownMessage = (
   const section = document.createElement("section");
   section.id = "dropdown-message";
 
-  const p = document.createElement("p");
-  p.className = "message-text";
-  p.textContent = message;
+  const paragraphEl = document.createElement("p");
+  paragraphEl.className = "message-text";
+  paragraphEl.textContent = message;
 
   const nav = document.createElement("nav");
 
-  const a = document.createElement("a");
-  a.href = buttonUrl;
-  a.target = "_blank";
-  a.className = "dropdown-button";
+  const linkEl = document.createElement("a");
+  linkEl.href = buttonUrl;
+  linkEl.target = "_blank";
+  linkEl.className = "dropdown-button";
 
   const textNode = document.createTextNode("Visit Website");
 
@@ -25,11 +25,11 @@ export const createDropdownMessage = (
   icon.className = "icon";
   icon.textContent = "➜";
 
-  a.appendChild(textNode);
-  a.appendChild(icon);
-  nav.appendChild(a);
+  linkEl.appendChild(textNode);
+  linkEl.appendChild(icon);
+  nav.appendChild(linkEl);
 
-  section.appendChild(p);
+  section.appendChild(paragraphEl);
   section.appendChild(nav);
 
   return section;

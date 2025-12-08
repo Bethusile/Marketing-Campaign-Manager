@@ -1,33 +1,45 @@
 //JaysonBam
 //Compiles all target images to a sing mind target
 
-import type { MindAR } from "../types";
+import type { MindAR } from "../types/mindar";
 
 declare const MINDAR: MindAR;
 
+class ErrorWithEvent extends Error {
+  event?: Event | ErrorEvent;
+  constructor(message?: string) {
+    super(message);
+    Object.setPrototypeOf(this, ErrorWithEvent.prototype);
+  }
+}
+
 const loadImage = (src: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
-    const img = new Image();
+    const loadedImage = new Image();
     // Some hosts require no-referrer or appropriate CORS headers for canvas access.
-    img.crossOrigin = "anonymous";
+    loadedImage.crossOrigin = "anonymous";
     try {
-      img.referrerPolicy = "no-referrer";
-    } catch (e) {
+      loadedImage.referrerPolicy = "no-referrer";
+    } catch (_err) {
       // ignore if not supported
     }
-    img.onload = () => resolve(img);
-    img.onerror = (e) => {
-      type ErrorWithEvent = Error & { event?: Event | ErrorEvent | unknown };
-      const err = new Error(`Failed to load image: ${src}`) as ErrorWithEvent;
-      // attach original event for debugging (typed)
-      err.event = e as Event | ErrorEvent | unknown;
+    loadedImage.onload = () => resolve(loadedImage);
+    loadedImage.onerror = (errorEvent) => {
+      const err = new ErrorWithEvent(`Failed to load image: ${src}`);
+      // attach original event for debugging when it's an Event
+      if (errorEvent instanceof Event) {
+        err.event = errorEvent;
+      } else {
+        // append textual information when available
+        err.message = `${err.message} (${String(errorEvent)})`;
+      }
       reject(err);
     };
-    img.src = src;
+    loadedImage.src = src;
   });
 
 export const compileTargets = async (imageUrls: string[]): Promise<string> => {
-  const images = await Promise.all(imageUrls.map((u) => loadImage(u)));
+  const images = await Promise.all(imageUrls.map((imageUrl) => loadImage(imageUrl)));
   const compiler = new MINDAR.IMAGE.Compiler();
 
   console.log("Compiling targets...");
