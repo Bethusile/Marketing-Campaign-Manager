@@ -9,8 +9,8 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { useMediaQuery, Box, Card } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import darkLogo from '../assets/logos/dark-mode.png';
-import lightLogo from '../assets/logos/light-mode.png';
+import darkLogo from '../assets/BBD_BBD_Full_Colour_-_Black_1.png';
+import lightLogo from '../assets/BBD_BBD_Full_Colour_-_White_1.png';
 import '../styles.css';
 
 const Login = () => {
@@ -48,7 +48,7 @@ const Login = () => {
   };
 
   return (
-    <Box className="pageWrapper" component="main">
+    <Box className="loginContainer" component="main">
       <Card className="loginCard" component="section">
         <img src={currentLogo} alt="Login Logo" className="logo" />
         <h1 className={`welcome ${showCursor ? 'with-cursor' : ''}`}>Welcome To Marketing</h1>
