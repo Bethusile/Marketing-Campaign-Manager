@@ -7,27 +7,27 @@ declare const MINDAR: MindAR;
 
 const loadImage = (src: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
-    const img = new Image();
+    const loadedImage = new Image();
     // Some hosts require no-referrer or appropriate CORS headers for canvas access.
-    img.crossOrigin = "anonymous";
+    loadedImage.crossOrigin = "anonymous";
     try {
-      img.referrerPolicy = "no-referrer";
-    } catch (e) {
+      loadedImage.referrerPolicy = "no-referrer";
+    } catch (_err) {
       // ignore if not supported
     }
-    img.onload = () => resolve(img);
-    img.onerror = (e) => {
+    loadedImage.onload = () => resolve(loadedImage);
+    loadedImage.onerror = (errorEvent) => {
       type ErrorWithEvent = Error & { event?: Event | ErrorEvent | unknown };
       const err = new Error(`Failed to load image: ${src}`) as ErrorWithEvent;
       // attach original event for debugging (typed)
-      err.event = e as Event | ErrorEvent | unknown;
+      err.event = errorEvent as Event | ErrorEvent | unknown;
       reject(err);
     };
-    img.src = src;
+    loadedImage.src = src;
   });
 
 export const compileTargets = async (imageUrls: string[]): Promise<string> => {
-  const images = await Promise.all(imageUrls.map((u) => loadImage(u)));
+  const images = await Promise.all(imageUrls.map((imageUrl) => loadImage(imageUrl)));
   const compiler = new MINDAR.IMAGE.Compiler();
 
   console.log("Compiling targets...");

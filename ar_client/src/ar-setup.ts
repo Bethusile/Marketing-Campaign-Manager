@@ -12,8 +12,8 @@ declare const AFRAME: AFrameStatic;
 
 const updateOrReplaceDropdown = (message: string, buttonUrl?: string) => {
   //only one message at a time
-  const existing = document.getElementById("dropdown-message");
-  if (existing) existing.remove();
+  const existingDropdownEl = document.getElementById("dropdown-message");
+  if (existingDropdownEl) existingDropdownEl.remove();
 
   const newEl = createDropdownMessage(message, buttonUrl || "");
 
@@ -33,23 +33,23 @@ export const registerComponents = () => {
 
     init(this: AFrameComponent) {
       const element = this.el;
-      const aImage = element.querySelector("a-image") as AFrameEntity | null;
+      const aImageEl = element.querySelector("a-image") as AFrameEntity | null;
 
-      if (aImage) {
-        aImage.addEventListener("materialtextureloaded", (evt: Event) => {
-          const e = evt as CustomEvent<MaterialTextureLoadedDetail>;
-          const texture = e?.detail?.texture;
-          const img = texture?.image;
-          if (!img) return;
+      if (aImageEl) {
+          aImageEl.addEventListener("materialtextureloaded", (evt: Event) => {
+          const materialEvent = evt as CustomEvent<MaterialTextureLoadedDetail>;
+          const texture = materialEvent?.detail?.texture;
+          const textureImage = texture?.image;
+          if (!textureImage) return;
 
-          const typedImg = img as TexImage;
-          const width = typedImg.naturalWidth ?? typedImg.width;
-          const height = typedImg.naturalHeight ?? typedImg.height;
+          const textureImageEl = textureImage as TexImage;
+          const width = textureImageEl.naturalWidth ?? textureImageEl.width;
+          const height = textureImageEl.naturalHeight ?? textureImageEl.height;
 
           if (width && height) {
             const ratio = height / width;
-            aImage.setAttribute("height", String(ratio));
-            aImage.setAttribute("width", "1");
+            aImageEl.setAttribute("height", String(ratio));
+            aImageEl.setAttribute("width", "1");
           }
         });
       }
@@ -61,17 +61,17 @@ export const registerComponents = () => {
           let campaignId = this.data?.campaignId as number | undefined;
           if (!campaignId) {
             const attr = element.getAttribute("mindar-image-target");
-            let idx: number | undefined;
-            if (typeof attr === 'string') {
-              const m = attr.match(/targetIndex:\s*(\d+)/);
-              if (m) idx = Number(m[1]);
+            let targetIndex: number | undefined;
+              if (typeof attr === 'string') {
+              const matchResult = attr.match(/targetIndex:\s*(\d+)/);
+              if (matchResult) targetIndex = Number(matchResult[1]);
             } else if (attr && typeof attr === 'object') {
               // A-Frame may parse component data and return an object
               const parsed = attr as Record<string, unknown>;
-              if (parsed.targetIndex !== undefined) idx = Number(parsed.targetIndex as number);
+              if (parsed.targetIndex !== undefined) targetIndex = Number(parsed.targetIndex as number);
             }
-            if (idx !== undefined) {
-              campaignId = window.__TARGET_TO_CAMPAIGN?.[idx] as number | undefined;
+            if (targetIndex !== undefined) {
+              campaignId = window.__TARGET_TO_CAMPAIGN?.[targetIndex] as number | undefined;
             }
           }
           if (!campaignId) return;
@@ -80,37 +80,37 @@ export const registerComponents = () => {
           if (!campaign) return;
 
           // Update overlay image: preload then apply to prevent white flash
-          if (aImage) {
+          if (aImageEl) {
             try {
-              const img = new Image();
-              img.crossOrigin = 'anonymous';
-              try { (img as HTMLImageElement).referrerPolicy = 'no-referrer'; } catch {
+              const overlayImage = new Image();
+              overlayImage.crossOrigin = 'anonymous';
+              try { (overlayImage as HTMLImageElement).referrerPolicy = 'no-referrer'; } catch (_err) {
                 // ignore environments that disallow setting referrerPolicy
               }
 
               const onTexture = () => {
-                aImage.setAttribute('visible', 'true');
-                aImage.removeEventListener('materialtextureloaded', onTexture);
+                aImageEl.setAttribute('visible', 'true');
+                aImageEl.removeEventListener('materialtextureloaded', onTexture);
               };
 
-              img.onload = () => {
-                aImage.addEventListener('materialtextureloaded', onTexture);
-                aImage.setAttribute('src', campaign.displayUrl);
+              overlayImage.onload = () => {
+                aImageEl.addEventListener('materialtextureloaded', onTexture);
+                aImageEl.setAttribute('src', campaign.displayUrl);
               };
 
-              const onImgError = function (this: GlobalEventHandlers, ev: Event | string) {
+              const onOverlayPreloadError = function (this: GlobalEventHandlers, ev: Event | string) {
                 console.error('Overlay preload failed for', campaign.displayUrl, ev);
                 // fallback: still set src so A-Frame can handle error state
-                aImage.setAttribute('src', campaign.displayUrl);
-                aImage.setAttribute('visible', 'true');
+                aImageEl.setAttribute('src', campaign.displayUrl);
+                aImageEl.setAttribute('visible', 'true');
               };
-              img.onerror = onImgError;
+              overlayImage.onerror = onOverlayPreloadError;
 
-              img.src = campaign.displayUrl;
+              overlayImage.src = campaign.displayUrl;
             } catch (err) {
               console.error('Error preloading overlay', err);
-              aImage.setAttribute('src', campaign.displayUrl);
-              aImage.setAttribute('visible', 'true');
+              aImageEl.setAttribute('src', campaign.displayUrl);
+              aImageEl.setAttribute('visible', 'true');
             }
           }
 
@@ -142,15 +142,15 @@ const createCamera = () => {
     // attach handler component (map is used to resolve campaign id at runtime)
     entity.setAttribute("target-handler", "");
 
-  const aImage = document.createElement("a-image");
-  aImage.setAttribute("rotation", "0 0 0");
-  aImage.setAttribute("position", "0 0 0");
-  aImage.setAttribute("width", "1");
-  aImage.setAttribute("height", "1");
+  const aImageEl = document.createElement("a-image");
+  aImageEl.setAttribute("rotation", "0 0 0");
+  aImageEl.setAttribute("position", "0 0 0");
+  aImageEl.setAttribute("width", "1");
+  aImageEl.setAttribute("height", "1");
   // start hidden to avoid showing an untextured white quad while the image loads
-  aImage.setAttribute("visible", "false");
+  aImageEl.setAttribute("visible", "false");
 
-  entity.appendChild(aImage);
+  entity.appendChild(aImageEl);
   return entity;
 };
 

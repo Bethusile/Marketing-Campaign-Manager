@@ -25,9 +25,9 @@ const API_BASE_URL = (import.meta.env.VITE_SERVER_URL as string);
 
 export const getActiveCampaignTargets = async (): Promise<Array<{id: number; targetUrl: string;}>> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/getCampaign/active`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const campaigns = (await res.json()) as RawCampaign[];
+    const response = await fetch(`${API_BASE_URL}/api/getCampaign/active`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const campaigns = (await response.json()) as RawCampaign[];
     const result: Array<{id: number; targetUrl: string}> = [];
     campaigns.forEach((campaign) => {
       const isActive = campaign.isActive ?? campaign.is_active ?? false;
@@ -49,25 +49,25 @@ export const getActiveCampaignTargets = async (): Promise<Array<{id: number; tar
 
 export const getCampaign = async (id: number,): Promise<Campaign | undefined> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/getCampaign/${id}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const raw = (await res.json()) as RawCampaign;
-    const targetRaw = raw.targetUrl ?? raw.target_url ?? '';
-    const displayRaw = raw.displayUrl ?? raw.display_url ?? raw.overlay_url ?? '';
-    const buttonRaw = raw.buttonUrl ?? raw.button_url ?? '';
+    const response = await fetch(`${API_BASE_URL}/api/getCampaign/${id}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const rawCampaign = (await response.json()) as RawCampaign;
+    const targetRaw = rawCampaign.targetUrl ?? rawCampaign.target_url ?? '';
+    const displayRaw = rawCampaign.displayUrl ?? rawCampaign.display_url ?? rawCampaign.overlay_url ?? '';
+    const buttonRaw = rawCampaign.buttonUrl ?? rawCampaign.button_url ?? '';
     const targetUrl = targetRaw ? (/^https?:\/\//.test(targetRaw) ? targetRaw : `${API_BASE_URL}${targetRaw}`) : undefined;
     const displayUrl = displayRaw ? (/^https?:\/\//.test(displayRaw) ? displayRaw : `${API_BASE_URL}${displayRaw}`) : undefined;
     if (!targetUrl) console.warn(`Campaign ${id} missing targetUrl`);
     if (!displayUrl) console.warn(`Campaign ${id} missing displayUrl`);
     const campaign: Campaign = {
-      id: Number(raw.id),
-      title: raw.title ?? '',
-      message: raw.message ?? '',
+      id: Number(rawCampaign.id),
+      title: rawCampaign.title ?? '',
+      message: rawCampaign.message ?? '',
       buttonUrl: buttonRaw,
       targetUrl: targetUrl ?? '',
       displayUrl: displayUrl ?? '',
-      isActive: Boolean(raw.isActive ?? raw.is_active ?? false),
-      createdAt: raw.createdAt ?? raw.created_at ?? '',
+      isActive: Boolean(rawCampaign.isActive ?? rawCampaign.is_active ?? false),
+      createdAt: rawCampaign.createdAt ?? rawCampaign.created_at ?? '',
     };
     return campaign;
   } catch (error) {

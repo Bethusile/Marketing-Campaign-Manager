@@ -47,8 +47,8 @@ export const enforceHighQualityCamera = () => {
 // Start a camera fallback stream and append a fullscreen video element with id `ar-camera-video`.
 export const startCameraFallbackStream = async (): Promise<void> => {
   try {
-    const existing = document.getElementById('ar-camera-video') as HTMLVideoElement | null;
-    if (existing) return;
+    const existingVideoEl = document.getElementById('ar-camera-video') as HTMLVideoElement | null;
+    if (existingVideoEl) return;
 
     const video = document.createElement('video');
     video.id = 'ar-camera-video';
@@ -71,11 +71,11 @@ export const startCameraFallbackStream = async (): Promise<void> => {
 
 // Stop and remove the fallback camera video element and its tracks
 export const stopCameraFallbackStream = (): void => {
-  const video = document.getElementById('ar-camera-video') as HTMLVideoElement | null;
-  if (!video) return;
-  const stream = video.srcObject as MediaStream | null;
-  if (stream) {
-    stream.getTracks().forEach((t) => t.stop());
+  const videoEl = document.getElementById('ar-camera-video') as HTMLVideoElement | null;
+  if (!videoEl) return;
+  const videoStream = videoEl.srcObject as MediaStream | null;
+  if (videoStream) {
+    videoStream.getTracks().forEach((track) => track.stop());
   }
-  video.remove();
+  videoEl.remove();
 };
