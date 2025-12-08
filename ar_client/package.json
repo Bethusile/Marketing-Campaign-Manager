@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "download-vendor": "powershell -ExecutionPolicy Bypass -File ./scripts/download-vendor.ps1",
+    "download-vendor:check": "powershell -NoProfile -Command \"Get-ChildItem .\\public\\vendor -File | Select-Object Name,Length\""
   },
   "devDependencies": {
     "typescript": "~5.9.3",
