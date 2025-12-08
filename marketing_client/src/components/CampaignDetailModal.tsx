@@ -5,14 +5,12 @@ import {
   Modal,
   Box,
   Typography,
-  IconButton,
   Divider,
   Chip,
   Button,
   CardMedia,
   useTheme,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import type { Campaign } from '../api/campaign';
 import { StyledModalBox } from '../styles/sharedStyles';
 import { ACCENT_RED } from '../styles/themeConstants';
@@ -66,9 +64,7 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
           <Typography variant="body2" color={isLight ? '#555' : '#ccc'}>
             Uploaded: {campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
           </Typography>
-          <IconButton onClick={onClose} sx={{ color: ACCENT_RED }}>
-            <CloseIcon fontSize="large" />
-          </IconButton>
+          
         </Box>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
           <Box sx={{ flex: '1 1 50%', minWidth: 0 }}>
