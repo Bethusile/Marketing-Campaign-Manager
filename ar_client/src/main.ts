@@ -4,7 +4,7 @@
 import "./style.css";
 import "./vendor/aframe.min.js";
 import "./vendor/mindar-image-aframe.prod.js";
-import { getActiveCampaignTargets } from "./services/api";
+import { getActiveCampaignTargets } from "./api/campaign.js";
 import { initAR } from "./ar-setup";
 import { compileTargets } from "./utils/compiler";
 import { showErrorOnScreen } from "./components/ErrorBanner";

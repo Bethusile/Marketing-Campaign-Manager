@@ -1,7 +1,7 @@
 //JaysonBam
 //Main AR logic with AFrame
 
-import { getCampaign } from "./services/api";
+import { getCampaign } from "./api/campaign";
 import { createDropdownMessage } from "./components/DropdownMessage";
 import { showErrorOnScreen } from "./components/ErrorBanner";
 import type { AFrameEntity, AFrameComponent } from "./types";
