@@ -6,15 +6,24 @@ import DeleteIcon from '@mui/icons-material/Delete';
 // 1. Update Interface to include fileType
 interface FileUploadProps {
   onFileSelect: (file: File | null) => void;
-  fileType?: string; // Made optional, using lowercase 'string'
+  fileType?: string;
+  existingImageUrl?: string;
 }
 
 // 2. Destructure fileType from the props object, set a default value
-const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image/Doc" }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image/Doc", existingImageUrl = "" }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Construct full image URL if it's a relative path
+  const getFullImageUrl = (url: string): string => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+    return `${serverUrl}${url}`;
+  };
 
   // Handle drag events
   const handleDrag = (e: React.DragEvent) => {
@@ -73,11 +82,13 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image
     inputRef.current?.click();
   };
 
+  const inputId = `file-input-${fileType || 'upload'}`;
+
   return (
     <Box sx={{ width: '100%', mt: 2 }}>
       
-      {/* 1. Drag & Drop Zone */}
-      {!selectedFile && (
+      {/* 1. Drag & Drop Zone or Existing Image */}
+      {!selectedFile && !existingImageUrl && (
         <Paper
           variant="outlined"
           onDragEnter={handleDrag}
@@ -101,10 +112,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image
         >
           <input
             ref={inputRef}
+            id={inputId}
             type="file"
             accept="image/*"
             style={{ display: 'none' }}
             onChange={handleChange}
+            aria-label={`Upload ${fileType} file`}
           />
           
           <CloudUploadIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 1 }} />
@@ -115,34 +128,75 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             or click to browse
           </Typography>
-          <Button variant="contained" component="span">
-            Upload File
-          </Button>
+          <Box component="label" htmlFor={inputId} sx={{ cursor: 'pointer' }}>
+            <Button variant="contained" component="span">
+              Upload File
+            </Button>
+          </Box>
         </Paper>
       )}
 
-      {/* 2. File Preview State */}
-      {selectedFile && previewUrl && (
-        <Paper variant="outlined" sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              component="img"
-              src={previewUrl}
-              alt="Preview"
-              sx={{ width: 60, height: 60, borderRadius: 1, objectFit: 'cover' }}
-            />
-            <Box>
-                <Typography variant="subtitle1" noWrap sx={{ maxWidth: 200 }}>
-                    {selectedFile.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                    {(selectedFile.size / 1024).toFixed(1)} KB
-                </Typography>
+      {/* 2. Existing Image Display */}
+      {!selectedFile && existingImageUrl && (
+        <Paper variant="outlined" sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Typography variant="subtitle1">Current {fileType}</Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button variant="outlined" component="span" onClick={onButtonClick}>
+                Replace
+              </Button>
+              <IconButton onClick={handleRemove} color="error">
+                <DeleteIcon />
+              </IconButton>
             </Box>
           </Box>
-          <IconButton onClick={handleRemove} color="error">
-            <DeleteIcon />
-          </IconButton>
+          <Box
+            component="img"
+            src={getFullImageUrl(existingImageUrl)}
+            alt="Current"
+            sx={{
+              width: '100%',
+              maxHeight: 350,
+              borderRadius: 1,
+              objectFit: 'contain',
+              bgcolor: 'grey.50',
+              border: '1px solid',
+              borderColor: 'grey.200'
+            }}
+          />
+        </Paper>
+      )}
+
+      {/* 3. File Preview State */}
+      {selectedFile && previewUrl && (
+        <Paper variant="outlined" sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Box>
+              <Typography variant="subtitle1" noWrap sx={{ maxWidth: 200 }}>
+                {selectedFile.name}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {(selectedFile.size / 1024).toFixed(1)} KB
+              </Typography>
+            </Box>
+            <IconButton onClick={handleRemove} color="error">
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+          <Box
+            component="img"
+            src={previewUrl}
+            alt="Preview"
+            sx={{
+              width: '100%',
+              maxHeight: 350,
+              borderRadius: 1,
+              objectFit: 'contain',
+              bgcolor: 'grey.50',
+              border: '1px solid',
+              borderColor: 'grey.200'
+            }}
+          />
         </Paper>
       )}
     </Box>

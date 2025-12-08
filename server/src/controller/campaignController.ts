@@ -132,8 +132,13 @@ export const updateCampaign = async (
       const raw = req.body.isActive;
       updateData.isActive = (typeof raw === 'string') ? (raw.toLowerCase() === 'true') : Boolean(raw);
     }
-    if (overlayFile) updateData.overlay_url = `/uploads/${overlayFile.filename}`;
-    if (targetFile) updateData.target_url = `/uploads/${targetFile.filename}`;
+    // Only update image URLs if new files are provided
+    if (overlayFile) {
+      updateData.overlay_url = `/uploads/${overlayFile.filename}`;
+    }
+    if (targetFile) {
+      updateData.target_url = `/uploads/${targetFile.filename}`;
+    }
     const [affectedRows] = await Campaign.update({ ...updateData }, {
       where: { id: req.params.id },
     });

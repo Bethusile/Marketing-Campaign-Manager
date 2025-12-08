@@ -22,6 +22,8 @@ const Campaign: React.FC = () => {
 
   const [redactedFile, setRedactedFile] = useState<File | null>(null);
   const [unredactedFile, setUnredactedFile] = useState<File | null>(null);
+  const [overlayUrl, setOverlayUrl] = useState<string>('');
+  const [targetUrl, setTargetUrl] = useState<string>('');
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [buttonUrl, setButtonUrl] = useState('');
@@ -42,6 +44,8 @@ const Campaign: React.FC = () => {
         setButtonUrl(campaign.button_url || '');
         setComments(campaign.comments || '');
         setStatus(campaign.isActive ? 'Active' : 'Inactive');
+        setOverlayUrl(campaign.overlay_url || '');
+        setTargetUrl(campaign.target_url || '');
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error('Failed to load campaign', err);
@@ -69,6 +73,7 @@ const Campaign: React.FC = () => {
 
       if (isEdit && id) {
         const updated = await updateCampaign(Number(id), form);
+        console.log('Updated campaign:', updated);
         alert(`Campaign updated: ${updated.title}`);
       } else {
         const created = await postCampaign(form);
@@ -126,10 +131,10 @@ const Campaign: React.FC = () => {
           {/* Uploads: side-by-side on md+, stacked on xs */}
           <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' }, mt: 1 }}>
             <Box sx={{ flex: 1 }}>
-              <UploadFile onFileSelect={(f) => setRedactedFile(f)} fileType="Overlay" />
+              <UploadFile onFileSelect={(f) => setRedactedFile(f)} fileType="Overlay" existingImageUrl={overlayUrl} />
             </Box>
             <Box sx={{ flex: 1 }}>
-              <UploadFile onFileSelect={(f) => setUnredactedFile(f)} fileType="Target" />
+              <UploadFile onFileSelect={(f) => setUnredactedFile(f)} fileType="Target" existingImageUrl={targetUrl} />
             </Box>
           </Box>
 
