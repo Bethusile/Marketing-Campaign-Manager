@@ -3,9 +3,10 @@
 
 import { getCampaign } from "./services/api";
 import { createDropdownMessage } from "./components/DropdownMessage";
+import { showErrorOnScreen } from "./components/ErrorBanner";
 import type { AFrameEntity, AFrameComponent } from "./types";
 import type { AFrameStatic, MaterialTextureLoadedDetail, TexImage } from "./types/aframe";
-import { enforceHighQualityCamera } from "./utils/camera";
+import { enforceHighQualityCamera, startCameraFallbackStream, stopCameraFallbackStream } from "./utils/camera";
 
 declare const AFRAME: AFrameStatic;
 
@@ -118,6 +119,9 @@ export const registerComponents = () => {
             updateOrReplaceDropdown(campaign.message, campaign.buttonUrl);
           }, 3000);
         } catch (err) {
+          if (err instanceof Error && (err.message === "Server error, could not fetch data" || err.message === "User error to fetch data")) {
+            showErrorOnScreen(err.message);
+          }
           console.error("target-handler: error handling targetFound", err);
         }
       });
@@ -151,7 +155,7 @@ const createCamera = () => {
 };
 
 
-export const initAR = async (compiledMindUrl: string, campaignIds: number[]) => {
+export const initAR = async (compiledMindUrl?: string | null, campaignIds: number[] = []) => {
   enforceHighQualityCamera();
   registerComponents();
 
@@ -162,10 +166,19 @@ export const initAR = async (compiledMindUrl: string, campaignIds: number[]) => 
   sceneContainer.className = "ar-scene-container";
 
   const scene = document.createElement("a-scene");
-  scene.setAttribute(
-    "mindar-image",
-    `imageTargetSrc: ${compiledMindUrl}; autoStart: true; uiScanning: no;`,
-  );
+  // If we have a compiledMindUrl, enable MindAR image tracking. Otherwise fall back to camera-only view.
+  if (compiledMindUrl && compiledMindUrl.trim() !== "") {
+    scene.setAttribute(
+      "mindar-image",
+      `imageTargetSrc: ${compiledMindUrl}; autoStart: true; uiScanning: no;`,
+    );
+    // If a fallback camera was started earlier, stop it to avoid duplicate streams
+    try { stopCameraFallbackStream(); } catch (err) { /* ignore */ }
+  } else {
+    // camera-only: do not attach mindar-image, keep a simple scene so the camera view is available
+    scene.setAttribute("embedded", "true");
+    (scene as HTMLElement).style.background = 'transparent';
+  }
   scene.setAttribute("color-space", "sRGB");
   scene.setAttribute(
     "renderer",
@@ -177,10 +190,17 @@ export const initAR = async (compiledMindUrl: string, campaignIds: number[]) => 
   // camera
   scene.appendChild(createCamera());
 
-  campaignIds.forEach((_, index) => {
-    scene.appendChild(createTargetEntity(index));
-  });
+  if (campaignIds && campaignIds.length > 0) {
+    campaignIds.forEach((_, index) => {
+      scene.appendChild(createTargetEntity(index));
+    });
+  }
 
   sceneContainer.appendChild(scene);
+  // If no compiled targets, start a plain camera stream behind the scene so user sees camera view
+  if (!compiledMindUrl || compiledMindUrl.trim() === "") {
+    startCameraFallbackStream().catch(() => { /* already logged */ });
+  }
+
   body.appendChild(sceneContainer);
 };
