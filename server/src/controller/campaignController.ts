@@ -1,12 +1,19 @@
 import { Request, Response } from 'express';
 import Campaign from '../model/campaign';
 import path from 'path';
+import fs from 'fs';
 
 // Multer setup for file uploads
 import multer from 'multer';
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    cb(null, path.join(__dirname, '../../public/uploads'));
+    const uploadPath = path.join(__dirname, '../../public/uploads');
+    try {
+      fs.mkdirSync(uploadPath, { recursive: true });
+      cb(null, uploadPath);
+    } catch (err) {
+      cb(err as Error, uploadPath);
+    }
   },
   filename: (_req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -73,8 +80,6 @@ interface MulterUploadedFile {
   path: string;
   buffer?: Buffer;
 }
-
-
 
 
 export const postCampaign = async (
