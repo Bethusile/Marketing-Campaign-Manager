@@ -1,6 +1,8 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db/connect';
 
+// This modal discribes the information for a campaign
+// A campaign links to a target, for its it AR function
 class Campaign extends Model {}
 
 Campaign.init({
@@ -28,6 +30,14 @@ Campaign.init({
     type: DataTypes.STRING(255),
     allowNull: false,
     defaultValue: '',
+  },
+  targetId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'targets',
+      key: 'id',
+    },
   },
   button_url: {
     type: DataTypes.STRING(255),

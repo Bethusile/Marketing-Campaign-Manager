@@ -1,12 +1,12 @@
 /// <reference types="node" />
 import { connectDB, sequelize } from '../src/db/connect';
-import Campaign from '../src/model/campaign';
+import '../src/model';
 
 (async () => {
   try {
     await connectDB();
-    await Campaign.sync({ alter: true });
-    console.log('Campaign table migrated successfully.');
+    await sequelize.sync({ alter: true });
+    console.log('All models migrated successfully.');
     await sequelize.close();
   } catch (error) {
     console.error('Migration failed:', error);
