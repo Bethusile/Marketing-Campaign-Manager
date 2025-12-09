@@ -6,7 +6,7 @@ import UploadFile from '../components/UploadSection';
 import Button from '../components/CustomButton';
 import Input from '../components/CustomInput';
 import Dropdown from '../components/CustomDropdown';
-import Alert from '../components/alert'; 
+import Alert from '../components/Alert'; 
 import '../styles.css';
 import { postCampaign, type CampaignForm, getCampaignById, updateCampaign, deleteCampaign } from '../api/campaign';
 
