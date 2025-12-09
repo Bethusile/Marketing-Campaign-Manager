@@ -1,7 +1,14 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db/connect';
 
-//This modal discribes the target information for AR
+/**
+ * Target: data used to detect an image in AR (redacted campaign image) and provide overlays (unredacted campaign image).
+ * Readated images form the target for the AR to detect, with its respected image to overlay on target. (Unredacted on redacted) 
+ * - `targetImageUrl`: original image the AR engine must detect.
+ * - `overlayImageUrl`: optional image shown over the detected target.
+ * - `targetMindUrl`: .mind file produced by the AR tooling (detection data).
+ * 
+ */
 class Target extends Model {}
 
 Target.init(
@@ -12,19 +19,19 @@ Target.init(
       autoIncrement: true,
     },
     title: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
     },
     description: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(1024),
       allowNull: true,
       defaultValue: null,
     },
     targetImageUrl: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      defaultValue: '',
+      defaultValue: null,
     },
     overlayImageUrl: {
       type: DataTypes.STRING(255),
@@ -38,11 +45,13 @@ Target.init(
     },
     createdAt: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
