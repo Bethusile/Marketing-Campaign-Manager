@@ -51,6 +51,14 @@ const Campaign: React.FC = () => {
     setAlertState(prev => ({ ...prev, open: false }));
   };
 
+  const handleSubmitValidation = (): boolean => {
+    if (!title.trim() || !message.trim() || !redactedFile || !buttonUrl || !unredactedFile ) {
+      showErrorAlert('Validation Error', 'Please fill in all required fields.');
+      return false;
+    }
+    return true;
+  }
+
   const showErrorAlert = (title: string, message: string) => {
     setAlertState({
       open: true,
@@ -111,15 +119,19 @@ const Campaign: React.FC = () => {
         comments,
       };
 
-      if (isEdit && id) {
-        const updated = await updateCampaign(Number(id), form);
-        showSuccessAlert('Campaign Updated', `Successfully updated campaign: ${updated.title}`);
-      } else {
-        const created = await postCampaign(form);
-        showSuccessAlert('Campaign Created', `Successfully created new campaign: ${created.title}`);
+      if(handleSubmitValidation()){
+        if (isEdit && id) {
+           const updated = await updateCampaign(Number(id), form);
+           showSuccessAlert('Campaign Updated', `Successfully updated campaign: ${updated.title}`);
+        }
+        else {
+           const created = await postCampaign(form);
+           showSuccessAlert('Campaign Created', `Successfully created new campaign: ${created.title}`);
+          }
+
+       setTimeout(() => navigate('/dashboard'), 1500); 
       }
 
-      setTimeout(() => navigate('/dashboard'), 1500); 
     } catch (err) {
       console.error('Failed to upload campaign', err);
       showErrorAlert('Upload Failed', 'The campaign could not be saved. Check the console for server details.');
