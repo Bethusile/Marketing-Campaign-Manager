@@ -8,7 +8,8 @@
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
     "build": "tsc",
-    "migrate:campaign": "ts-node scripts/migrateCampaign.ts"
+    "migrate:campaign": "ts-node scripts/migrateCampaign.ts",
+    "erd": "npm run build && sequelize-erd --source ./dist/erd-source.js --destination ./erd.svg"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,7 @@
     "@types/pg": "^8.6.6",
     "@types/sequelize": "^4.28.14",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "sequelize-erd": "^1.3.1"
   }
 }
