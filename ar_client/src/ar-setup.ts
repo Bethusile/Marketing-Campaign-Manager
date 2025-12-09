@@ -1,19 +1,27 @@
 //JaysonBam
 //Main AR logic with AFrame
 
-import { getCampaign } from "./services/api";
+import { getCampaign } from "./api/campaign";
 import { createDropdownMessage } from "./components/DropdownMessage";
 import { showErrorOnScreen } from "./components/ErrorBanner";
-import type { AFrameEntity, AFrameComponent } from "./types";
-import type { AFrameStatic, MaterialTextureLoadedDetail, TexImage } from "./types/aframe";
+import type { AFrameComponent, AFrameStatic } from "./types/aframe";
 import { enforceHighQualityCamera, startCameraFallbackStream, stopCameraFallbackStream } from "./utils/camera";
 
 declare const AFRAME: AFrameStatic;
 
+// Runtime type-guard for texture image objects to safely access width/height props
+function isTextureImageLike(obj: object | null): obj is { naturalWidth?: number; width?: number; naturalHeight?: number; height?: number } {
+  if (!obj || typeof obj !== 'object') return false;
+  return Object.prototype.hasOwnProperty.call(obj, 'naturalWidth') ||
+    Object.prototype.hasOwnProperty.call(obj, 'width') ||
+    Object.prototype.hasOwnProperty.call(obj, 'naturalHeight') ||
+    Object.prototype.hasOwnProperty.call(obj, 'height');
+}
+
 const updateOrReplaceDropdown = (message: string, buttonUrl?: string) => {
   //only one message at a time
-  const existing = document.getElementById("dropdown-message");
-  if (existing) existing.remove();
+  const existingDropdownEl = document.getElementById("dropdown-message");
+  if (existingDropdownEl) existingDropdownEl.remove();
 
   const newEl = createDropdownMessage(message, buttonUrl || "");
 
@@ -33,23 +41,21 @@ export const registerComponents = () => {
 
     init(this: AFrameComponent) {
       const element = this.el;
-      const aImage = element.querySelector("a-image") as AFrameEntity | null;
+      const aImageEl = element.querySelector("a-image");
 
-      if (aImage) {
-        aImage.addEventListener("materialtextureloaded", (evt: Event) => {
-          const e = evt as CustomEvent<MaterialTextureLoadedDetail>;
-          const texture = e?.detail?.texture;
-          const img = texture?.image;
-          if (!img) return;
-
-          const typedImg = img as TexImage;
-          const width = typedImg.naturalWidth ?? typedImg.width;
-          const height = typedImg.naturalHeight ?? typedImg.height;
-
+          if (aImageEl) {
+          aImageEl.addEventListener("materialtextureloaded", (evt: Event) => {
+          if (!(evt instanceof CustomEvent)) return;
+          const texture = evt.detail?.texture;
+          const textureImage = texture?.image ?? null;
+          if (!textureImage) return;
+          let width = (textureImage as HTMLImageElement).naturalWidth;
+          let height = (textureImage as HTMLImageElement).naturalHeight;
           if (width && height) {
-            const ratio = height / width;
-            aImage.setAttribute("height", String(ratio));
-            aImage.setAttribute("width", "1");
+            const targetWidth = Number(element.getAttribute('width')) || 1;
+            aImageEl.setAttribute("width", String(targetWidth));
+            aImageEl.setAttribute("height", String(targetWidth * (height / width)));
+          } else {
           }
         });
       }
@@ -58,20 +64,26 @@ export const registerComponents = () => {
         try {
           console.log("Target found");
           // Resolve campaign id: prefer explicit schema value, otherwise use global map
-          let campaignId = this.data?.campaignId as number | undefined;
+          let campaignId: number | undefined = undefined;
+          if (typeof this.data?.campaignId === 'number') campaignId = this.data.campaignId;
           if (!campaignId) {
             const attr = element.getAttribute("mindar-image-target");
-            let idx: number | undefined;
-            if (typeof attr === 'string') {
-              const m = attr.match(/targetIndex:\s*(\d+)/);
-              if (m) idx = Number(m[1]);
+            let targetIndex: number | undefined;
+              if (typeof attr === 'string') {
+              const matchResult = attr.match(/targetIndex:\s*(\d+)/);
+              if (matchResult) targetIndex = Number(matchResult[1]);
             } else if (attr && typeof attr === 'object') {
-              // A-Frame may parse component data and return an object
-              const parsed = attr as Record<string, unknown>;
-              if (parsed.targetIndex !== undefined) idx = Number(parsed.targetIndex as number);
+              // A-Frame may parse component data and return an object; do a safe extraction
+              try {
+                const parsedObj = JSON.parse(JSON.stringify(attr));
+                if (parsedObj && parsedObj.targetIndex !== undefined) targetIndex = Number(parsedObj.targetIndex);
+              } catch (_e) {
+                // ignore malformed object
+              }
             }
-            if (idx !== undefined) {
-              campaignId = window.__TARGET_TO_CAMPAIGN?.[idx] as number | undefined;
+            if (targetIndex !== undefined) {
+              const mapped = window.__TARGET_TO_CAMPAIGN ? window.__TARGET_TO_CAMPAIGN[targetIndex] : undefined;
+              if (typeof mapped === 'number') campaignId = mapped;
             }
           }
           if (!campaignId) return;
@@ -80,37 +92,37 @@ export const registerComponents = () => {
           if (!campaign) return;
 
           // Update overlay image: preload then apply to prevent white flash
-          if (aImage) {
+          if (aImageEl) {
             try {
-              const img = new Image();
-              img.crossOrigin = 'anonymous';
-              try { (img as HTMLImageElement).referrerPolicy = 'no-referrer'; } catch {
+              const overlayImage = new Image();
+              overlayImage.crossOrigin = 'anonymous';
+              try { overlayImage.referrerPolicy = 'no-referrer'; } catch (_err) {
                 // ignore environments that disallow setting referrerPolicy
               }
 
               const onTexture = () => {
-                aImage.setAttribute('visible', 'true');
-                aImage.removeEventListener('materialtextureloaded', onTexture);
+                aImageEl.setAttribute('visible', 'true');
+                aImageEl.removeEventListener('materialtextureloaded', onTexture);
               };
 
-              img.onload = () => {
-                aImage.addEventListener('materialtextureloaded', onTexture);
-                aImage.setAttribute('src', campaign.displayUrl);
+              overlayImage.onload = () => {
+                aImageEl.addEventListener('materialtextureloaded', onTexture);
+                aImageEl.setAttribute('src', campaign.displayUrl);
               };
 
-              const onImgError = function (this: GlobalEventHandlers, ev: Event | string) {
+              const onOverlayPreloadError = function (this: GlobalEventHandlers, ev: Event | string) {
                 console.error('Overlay preload failed for', campaign.displayUrl, ev);
                 // fallback: still set src so A-Frame can handle error state
-                aImage.setAttribute('src', campaign.displayUrl);
-                aImage.setAttribute('visible', 'true');
+                aImageEl.setAttribute('src', campaign.displayUrl);
+                aImageEl.setAttribute('visible', 'true');
               };
-              img.onerror = onImgError;
+              overlayImage.onerror = onOverlayPreloadError;
 
-              img.src = campaign.displayUrl;
+              overlayImage.src = campaign.displayUrl;
             } catch (err) {
               console.error('Error preloading overlay', err);
-              aImage.setAttribute('src', campaign.displayUrl);
-              aImage.setAttribute('visible', 'true');
+              aImageEl.setAttribute('src', campaign.displayUrl);
+              aImageEl.setAttribute('visible', 'true');
             }
           }
 
@@ -142,15 +154,15 @@ const createCamera = () => {
     // attach handler component (map is used to resolve campaign id at runtime)
     entity.setAttribute("target-handler", "");
 
-  const aImage = document.createElement("a-image");
-  aImage.setAttribute("rotation", "0 0 0");
-  aImage.setAttribute("position", "0 0 0");
-  aImage.setAttribute("width", "1");
-  aImage.setAttribute("height", "1");
+  const aImageEl = document.createElement("a-image");
+  aImageEl.setAttribute("rotation", "0 0 0");
+  aImageEl.setAttribute("position", "0 0 0");
+  aImageEl.setAttribute("width", "1");
+  aImageEl.setAttribute("height", "1");
   // start hidden to avoid showing an untextured white quad while the image loads
-  aImage.setAttribute("visible", "false");
+  aImageEl.setAttribute("visible", "false");
 
-  entity.appendChild(aImage);
+  entity.appendChild(aImageEl);
   return entity;
 };
 
@@ -177,7 +189,7 @@ export const initAR = async (compiledMindUrl?: string | null, campaignIds: numbe
   } else {
     // camera-only: do not attach mindar-image, keep a simple scene so the camera view is available
     scene.setAttribute("embedded", "true");
-    (scene as HTMLElement).style.background = 'transparent';
+    if (scene instanceof HTMLElement) scene.style.background = 'transparent';
   }
   scene.setAttribute("color-space", "sRGB");
   scene.setAttribute(

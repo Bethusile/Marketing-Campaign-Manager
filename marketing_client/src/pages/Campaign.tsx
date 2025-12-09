@@ -6,8 +6,16 @@ import UploadFile from '../components/UploadSection';
 import Button from '../components/CustomButton';
 import Input from '../components/CustomInput';
 import Dropdown from '../components/CustomDropdown';
+import Alert from '../components/alert'; 
 import '../styles.css';
 import { postCampaign, type CampaignForm, getCampaignById, updateCampaign, deleteCampaign } from '../api/campaign';
+
+type AlertStateType = {
+  open: boolean;
+  title: string;
+  message: string;
+  type: 'error' | 'success' | 'warning';
+};
 
 const Campaign: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +40,38 @@ const Campaign: React.FC = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
 
+  const [alertState, setAlertState] = useState<AlertStateType>({
+    open: false,
+    title: '',
+    message: '',
+    type: 'error',
+  });
+
+  const handleAlertClose = () => {
+    setAlertState(prev => ({ ...prev, open: false }));
+  };
+
+  const showErrorAlert = (title: string, message: string) => {
+    setAlertState({
+      open: true,
+      title,
+      message,
+      type: 'error',
+    });
+  };
+
+  const showSuccessAlert = (title: string, message: string) => {
+    setAlertState({
+      open: true,
+      title,
+      message,
+      type: 'success',
+    });
+  };
+
+  // NEW: delete confirmation state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
   useEffect(() => {
     let mounted = true;
     const load = async () => {
@@ -47,9 +87,8 @@ const Campaign: React.FC = () => {
         setOverlayUrl(campaign.overlay_url || '');
         setTargetUrl(campaign.target_url || '');
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error('Failed to load campaign', err);
-        alert('Failed to load campaign data.');
+        showErrorAlert('Campaign Load Error', 'Failed to retrieve campaign data from the server.');
       }
     };
 
@@ -60,6 +99,7 @@ const Campaign: React.FC = () => {
 
   const handleUploadCampaign = async () => {
     setLoading(true);
+    handleAlertClose(); 
     try {
       const form: CampaignForm = {
         title,
@@ -73,19 +113,16 @@ const Campaign: React.FC = () => {
 
       if (isEdit && id) {
         const updated = await updateCampaign(Number(id), form);
-        console.log('Updated campaign:', updated);
-        alert(`Campaign updated: ${updated.title}`);
+        showSuccessAlert('Campaign Updated', `Successfully updated campaign: ${updated.title}`);
       } else {
         const created = await postCampaign(form);
-        alert(`Campaign created: ${created.title}`);
+        showSuccessAlert('Campaign Created', `Successfully created new campaign: ${created.title}`);
       }
 
-      navigate('/dashboard');
+      setTimeout(() => navigate('/dashboard'), 1500); 
     } catch (err) {
-      // Basic error handling
-      // eslint-disable-next-line no-console
-      console.error('Failed to create campaign', err);
-      alert('Failed to upload campaign. See console for details.');
+      console.error('Failed to upload campaign', err);
+      showErrorAlert('Upload Failed', 'The campaign could not be saved. Check the console for server details.');
     } finally {
       setLoading(false);
     }
@@ -93,27 +130,37 @@ const Campaign: React.FC = () => {
 
   const handleDelete = async () => {
     if (!id) return;
-    const ok = window.confirm('Delete this campaign? This action cannot be undone.');
-    if (!ok) return;
+
+    handleAlertClose();
     setLoading(true);
+
     try {
       await deleteCampaign(Number(id));
-      alert('Campaign deleted');
-      navigate('/dashboard');
+      showSuccessAlert('Campaign Deleted', 'The campaign was successfully removed.');
+
+      setTimeout(() => navigate('/dashboard'), 1500);
     } catch (err) {
       console.error('Failed to delete campaign', err);
-      alert('Failed to delete campaign.');
+      showErrorAlert('Deletion Failed', 'The campaign could not be deleted from the server.');
     } finally {
       setLoading(false);
     }
   };
+
+  // NEW: global confirm handler
+  const confirmDelete = () => {
+    setDeleteConfirmOpen(false);
+    handleDelete();
+  };
+
+  // Make handler accessible to Alert
+  (window as any).__confirmDelete = confirmDelete;
 
   return (
     <>
       <NavBar />
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Header with back button */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
           <Typography variant="h5" component="section">
             {isEdit ? 'Update Campaign' : 'Create New Campaign'}
@@ -121,14 +168,12 @@ const Campaign: React.FC = () => {
           <MuiButton variant="outlined" onClick={() => navigate('/dashboard')}>Back to Dashboard</MuiButton>
         </Box>
 
-        {/* Main form */}
         <Box sx={{ display: 'grid', gap: 2 }}>
           <Dropdown label={'Status'} value={status} options={statusOptions} onChange={handleChange} />
           <Input label="Title" required value={title} onChange={(e) => setTitle(e.target.value)} />
           <Input label="Message" required multiline rows={5} value={message} onChange={(e) => setMessage(e.target.value)} />
           <Input label="URL" required value={buttonUrl} onChange={(e) => setButtonUrl(e.target.value)} />
 
-          {/* Uploads: side-by-side on md+, stacked on xs */}
           <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' }, mt: 1 }}>
             <Box sx={{ flex: 1 }}>
               <UploadFile onFileSelect={(f) => setRedactedFile(f)} fileType="Overlay" existingImageUrl={overlayUrl} />
@@ -140,20 +185,41 @@ const Campaign: React.FC = () => {
 
           <Input label="Comment" value={comments} onChange={(e) => setComments(e.target.value)} />
 
-          {/* Actions */}
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 1 }}>
             <Button label={isEdit ? 'Update Campaign' : 'Upload Campaign'} onClick={handleUploadCampaign} loading={loading} />
             <MuiButton variant="outlined" onClick={() => navigate('/dashboard')}>Cancel</MuiButton>
             {isEdit && (
-              <MuiButton variant="outlined" color="error" onClick={handleDelete}>
+              <MuiButton 
+                variant="outlined" 
+                color="error" 
+                onClick={() => setDeleteConfirmOpen(true)}
+              >
                 Delete Campaign
               </MuiButton>
             )}
           </Box>
         </Box>
       </Container>
+
+      {/* DELETE CONFIRMATION ALERT */}
+      <Alert
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        type="warning"
+        title="Are you sure?"
+        message="Are you sure you want to delete this campaign? This action cannot be undone."
+      />
+
+      {/* EXISTING ALERT */}
+      <Alert
+        open={alertState.open}
+        onClose={handleAlertClose}
+        type={alertState.type}
+        title={alertState.title}
+        message={alertState.message}
+      />
     </>
   );
-    };
+};
 
-    export default Campaign;
+export default Campaign;

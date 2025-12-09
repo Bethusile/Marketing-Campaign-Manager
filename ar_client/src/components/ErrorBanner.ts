@@ -1,15 +1,15 @@
 export const showErrorOnScreen = (message: string) => {
-  const existing = document.getElementById('ar-error');
-  if (existing) existing.remove();
+  const existingErrorEl = document.getElementById('ar-error');
+  if (existingErrorEl) existingErrorEl.remove();
 
-  const el = document.createElement('div');
-  el.id = 'ar-error';
-  el.className = 'ar-error-banner';
-  el.innerText = message;
+  const errorEl = document.createElement('div');
+  errorEl.id = 'ar-error';
+  errorEl.className = 'ar-error-banner';
+  errorEl.innerText = message;
 
-  document.body.appendChild(el);
+  document.body.appendChild(errorEl);
   return () => {
-    const cur = document.getElementById('ar-error');
-    if (cur) cur.remove();
+    const currentErrorEl = document.getElementById('ar-error');
+    if (currentErrorEl) currentErrorEl.remove();
   };
 };

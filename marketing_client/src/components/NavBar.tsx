@@ -14,18 +14,20 @@ import {
   Container,
   styled,
   useMediaQuery,
+  Button
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import { LOGO_WHITE, LOGO_RED, LOGO_BLACK, ACCENT_RED, DARK_BG } from '../styles/themeConstants';
+import { useNavigate } from 'react-router-dom';
 
 const NavBar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  
 
   const prefersLightMode = useMediaQuery('(prefers-color-scheme: light)');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -50,7 +52,6 @@ const NavBar: React.FC = () => {
     return scrolled ? LOGO_RED : LOGO_WHITE;
   };
 
-
   const GlassAppBar = styled(AppBar)(() => ({
     backgroundColor: getAppBarBg(),
     boxShadow: scrolled ? '0 4px 10px rgba(0,0,0,0.5)' : 'none',
@@ -59,16 +60,25 @@ const NavBar: React.FC = () => {
     zIndex: 1100,
   }));
 
+  const goToDashboard = () => navigate('/dashboard');
+  const logout = () => navigate('/login');
+
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', height: '100%' }}>
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', height: '4rem' }}>
       <Box sx={{ p: 2 }}>
-        <img src={getLogo()} alt="Logo" style={{ height: 30 }} />
+        <img src={getLogo()} alt="Logo" style={{ height: '4rem' }} onClick={goToDashboard} />
       </Box>
       <List>
         <ListItem disablePadding>
           <ListItemButton sx={{ color: prefersLightMode ? 'black' : 'white' }}>
             <AccountCircleIcon sx={{ mr: 1, color: prefersLightMode ? 'black' : 'white' }} />
             <ListItemText primary="John Doe" secondary="Current User" />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton onClick={logout}>
+            <ListItemText primary="Logout" sx={{ color: prefersLightMode ? 'black' : 'white' }} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -80,23 +90,81 @@ const NavBar: React.FC = () => {
       <CssBaseline />
       <GlassAppBar position="fixed">
         <Container maxWidth="lg">
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <img src={getLogo()} alt="Logo" style={{ height: 30, marginRight: 8 }} />
-              <Typography variant="h6" fontWeight="bold" sx={{ color: getTextColor() }}>
-                AR Manager
-              </Typography>
-            </Box>
+          <Toolbar disableGutters>
 
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-              <Typography sx={{ color: getTextColor(), mr: 1.5 }}>John Doe</Typography>
-              <AccountCircleIcon sx={{ fontSize: 32, color: getTextColor() }} />
-            </Box>
+  {/* LEFT — LOGO */}
+  <Box
+    sx={{
+      flex: 1,
+      display: 'flex',
+      alignItems: 'center',
+      cursor: 'pointer',
+    }}
+    onClick={goToDashboard}
+  >
+    <img
+      src={getLogo()}
+      alt="Logo"
+      style={{ height: '3.5rem', marginRight: 8 }}
+    />
+  </Box>
 
-            <IconButton color="inherit" aria-label="open drawer" edge="start" onClick={handleDrawerToggle} sx={{ display: { md: 'none' } }}>
-              <MenuIcon sx={{ color: getTextColor() }} />
-            </IconButton>
-          </Toolbar>
+  {/* CENTER — TITLE */}
+  <Box
+    sx={{
+      flex: 1,
+      display: 'flex',
+      justifyContent: 'center',
+    }}
+  >
+    <Typography
+      variant="h5"
+      fontWeight="bold"
+      sx={{ color: getTextColor() }}
+    >
+      Campaign Manager
+    </Typography>
+  </Box>
+
+  {/* RIGHT — USER + LOGOUT (DESKTOP) */}
+  <Box
+    sx={{
+      flex: 1,
+      display: { xs: 'none', md: 'flex' },
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+    }}
+  >
+    <Typography sx={{ color: getTextColor(), mr: 1.5 }}>John Doe</Typography>
+    <AccountCircleIcon sx={{ fontSize: 32, color: getTextColor(), mr: 2 }} />
+
+    <Button
+      variant="outlined"
+      size="small"
+      onClick={logout}
+      sx={{
+        color: getTextColor(),
+        borderColor: getTextColor(),
+        '&:hover': { borderColor: getTextColor() },
+      }}
+    >
+      Logout
+    </Button>
+  </Box>
+
+  {/* MOBILE MENU BUTTON (still right side) */}
+  <IconButton
+    color="inherit"
+    aria-label="open drawer"
+    edge="end"
+    onClick={handleDrawerToggle}
+    sx={{ display: { md: 'none' } }}
+  >
+    <MenuIcon sx={{ color: getTextColor() }} />
+  </IconButton>
+
+</Toolbar>
+
         </Container>
       </GlassAppBar>
 
