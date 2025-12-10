@@ -1,4 +1,6 @@
 import './style.css'
+// Import the getImages function
+import { getImages } from './helpers/getImages';
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
 
@@ -8,8 +10,6 @@ const title:HTMLElement = document.createElement('h1');
 title.innerText = 'Campaign Manager';
 app.appendChild(title);
 document.body.appendChild(app);
-
-
 
 // Response section 
 const respPre: HTMLPreElement = document.createElement('pre');
@@ -23,6 +23,21 @@ respSection.appendChild(respHeading);
 respSection.appendChild(respPre);
 app.appendChild(respSection);
 
+
+const getImagesSection: HTMLElement = document.createElement('section');
+const getImagesHeading: HTMLElement = document.createElement('h2');
+getImagesHeading.innerText = 'Get Campaign Images';
+getImagesSection.appendChild(getImagesHeading);
+
+const getImagesButton: HTMLButtonElement = document.createElement('button');
+getImagesButton.innerText = 'Load Images';
+
+getImagesButton.addEventListener('click', async () => {
+    const response = await getImages();
+    setResp(response);
+});
+getImagesSection.appendChild(getImagesButton);
+app.appendChild(getImagesSection);
 
 //Responce
 let resp: JSONValue | null = null;

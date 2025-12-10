@@ -11,6 +11,7 @@ import {
   upload
 } from '../controller/campaignController';
 import { getTarget } from '../controller/targetController';
+import { getImagesHandler } from '../handlers/getImagesHandler';
 
 const router = Router();
 
@@ -40,5 +41,8 @@ router.delete('/deleteCampaign/:id', allowAll, deleteCampaign);
 
 // Target route
 router.get('/getTarget', allowAll, getTarget);
+
+// Get Images route
+router.get('/getImagesHandler', allowAll, getImagesHandler);
 
 export default router;
