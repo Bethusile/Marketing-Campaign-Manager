@@ -15,3 +15,38 @@
   border: 1px solid #e1e1e1;
   overflow: auto;
 }
+
+.upload-section {
+  padding: 16px;
+  margin-top: 24px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column; /* rows stack vertically */
+  gap: 12px;
+}
+
+.form-row {
+  display: flex;          /* label and input next to each other */
+  flex-direction: row;    /* horizontal alignment */
+  align-items: center;    /* vertical center of label + input */
+  gap: 8px;               /* space between label and input */
+}
+
+.upload-section input,
+.upload-section button {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.upload-section .small-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  align-self: flex-start; /* button aligned left */
+  cursor: pointer;
+}
+
