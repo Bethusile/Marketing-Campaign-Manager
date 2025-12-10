@@ -10,6 +10,7 @@ import {
   deleteCampaign,
   upload
 } from '../controller/campaignController';
+import { toggleCampaignActive } from '../handlers/campaignStatusHandler';
 import { getTarget } from '../controller/targetController';
 
 const router = Router();
@@ -40,5 +41,7 @@ router.delete('/deleteCampaign/:id', allowAll, deleteCampaign);
 
 // Target route
 router.get('/getTarget', allowAll, getTarget);
+// Toggle Campaign Active route
+router.put('/toggleCampaign/:id', allowAll, toggleCampaignActive);
 
 export default router;
