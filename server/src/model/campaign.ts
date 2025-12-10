@@ -2,19 +2,24 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db/connect';
 
 /**
- * Campaign: a marketing campaign that uses a Target for AR detection.
- * Contains title, message, and URLs button
- * `targetId` links to the Target that the campaign displays in AR.
- * target and overlay URL are now in linked target, kept here now for tranistion
- * keep track of update and create dates for sorting by dates, for Marketing team
+ * Campaign: a marketing campaign with campaign information and target-mind info.
+ * Contains title, message, and a button URL.
+ * The target mind is a single file used by MindAR to detect images. A single mind file
+ * can contain multiple image targets; `targetIdMap` maps each index in the mind file
+ * to a `CampaignImages` entry to determine the overlay.
+ * Tracks creation and update timestamps for sorting and auditing.
  */
 class Campaign extends Model {}
 
 Campaign.init({
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING(3),
     primaryKey: true,
-    autoIncrement: true,
+    allowNull: false,
+    unique: true,
+    validate: {
+      is: /^[A-Za-z0-9]{3}$/,
+    },
   },
   title: {
     type: DataTypes.STRING(255),
@@ -26,25 +31,17 @@ Campaign.init({
     allowNull: false,
     defaultValue: '',
   },
-  target_url: {
+  targetMindUrl: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    allowNull: true,
     defaultValue: '',
   },
-  overlay_url: {
-    type: DataTypes.STRING(255),
+  targetIdMap: {
+    type: DataTypes.JSON,
     allowNull: false,
-    defaultValue: '',
+    defaultValue: {},
   },
-  targetId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'targets',
-      key: 'id',
-    },
-  },
-  button_url: {
+  buttonUrl: {
     type: DataTypes.STRING(255),
     allowNull: false,
     defaultValue: '',
@@ -53,13 +50,6 @@ Campaign.init({
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
-  },
-  comments: {
-    type: DataTypes.STRING(1024),
-    allowNull: true,
-    validate: {
-      len: [0, 1024],
-    },
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -76,6 +66,21 @@ Campaign.init({
   modelName: 'Campaign',
   tableName: 'campaigns',
   timestamps: true,
+});
+
+// auto-generate a unique 3-char alphanumeric
+Campaign.beforeValidate(async (campaign: any) => {
+  if (campaign.id) return;
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
+  const gen = () =>
+    Array.from({ length: 3 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  let candidate;
+  let exists;
+  do {
+    candidate = gen();
+    exists = await Campaign.findByPk(candidate);
+  } while (exists);
+  campaign.id = candidate;
 });
 
 export default Campaign;
