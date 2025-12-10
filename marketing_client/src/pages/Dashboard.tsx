@@ -6,7 +6,7 @@ import CampaignCard from '../components/CampaignCard';
 import CampaignDetailModal from '../components/CampaignDetailModal';
 import CampaignControls from '../components/CampaignControls';
 import NavBar from '../components/NavBar';
-import Alert from '../components/alert'; // <-- IMPORT THE NEW ALERT COMPONENT
+import Alert from '../components/Alert'; 
 
 import type { Campaign as ApiCampaign } from '../api/campaign';
 import { getAllCampaigns } from '../api/campaign';
