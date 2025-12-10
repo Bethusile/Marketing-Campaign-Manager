@@ -1,8 +1,6 @@
+const API_BASE_URL = (import.meta.env as Record<string, any>).VITE_API_BASE_URL || 'http://localhost:3000';
 
-// Adjust this base URL to match your backend server (e.g., localhost:3000)
-const API_BASE_URL = 'http://localhost:3000'; 
-
-export const updateCampaignStatus = async (id: string, isActive: boolean) => {
+export const updateCampaignStatus = async (id: string, isActive: boolean): Promise<any> => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/toggleCampaign/${id}`, {
       method: 'PUT', 
@@ -13,13 +11,17 @@ export const updateCampaignStatus = async (id: string, isActive: boolean) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
+    
+      return { success: false, error: true, status: response.status, message: response.statusText };
     }
 
-    return await response.json();
-  } catch (error) {
+    const data = await response.json();
+    return { success: true, error: false, data };
+    
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
     console.error('Failed to update campaign:', error);
-    // Return a standardized error object to display in your renderer
-    return { error: 'API Call Failed', details: error };
+    
+    return { success: false, error: true, message: error.message };
   }
 };
