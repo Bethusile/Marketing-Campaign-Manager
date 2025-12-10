@@ -7,16 +7,13 @@ import '../styles.css';
 
 const Login = () => {
   const navigate = useNavigate();
-
-  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const currentLogo = isDark ? lightLogo : darkLogo;
-
   const handleLogin = () => navigate('/dashboard'); 
 
   return (
     <Box className="loginContainer" component="main">
       <Card className="loginCard" component="section">
-        <img src={currentLogo} alt="Login Logo" className="logo" />
+        <img src={lightLogo} alt="Login Logo" className="logo light-logo" />
+        <img src={darkLogo} alt="Login Logo" className="logo dark-logo" />
 
         <h1 className="welcome">Welcome to AR Marketing Hub</h1>
         <p className="tagline"> Create, manage, and deploy Augmented Reality marketing campaigns </p>

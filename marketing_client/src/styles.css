@@ -98,3 +98,20 @@
 .googleButton:hover .MuiSvgIcon-root {
   filter: brightness(0) invert(1);
 }
+
+.light-logo {
+  display: none;
+}
+
+.dark-logo {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  .light-logo {
+    display: block;
+  }
+  .dark-logo {
+    display: none;
+  }
+}
