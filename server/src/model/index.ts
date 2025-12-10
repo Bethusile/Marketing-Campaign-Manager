@@ -1,7 +1,17 @@
-import Target from './target';
+import CampaignImages from './campaignImages';
 import Campaign from './campaign';
+import JunctionTable from './junctionTable';
 
-Target.hasMany(Campaign, { foreignKey: 'targetId' });
-Campaign.belongsTo(Target, { foreignKey: 'targetId' });
+Campaign.belongsToMany(CampaignImages, {
+	through: JunctionTable,
+	foreignKey: 'campaignId',
+	otherKey: 'campaignImageId',
+});
 
-export { Target, Campaign };
+CampaignImages.belongsToMany(Campaign, {
+	through: JunctionTable,
+	foreignKey: 'campaignImageId',
+	otherKey: 'campaignId',
+});
+
+export { Campaign, CampaignImages, JunctionTable };
