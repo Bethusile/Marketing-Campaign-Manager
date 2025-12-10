@@ -2,69 +2,81 @@ import './style.css'
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
 
-const resolvedBase = (() => {
-	const fromEnv = import.meta.env.VITE_API_BASE_URL;
-	if (fromEnv) {
-		return fromEnv;
+function getApiBaseUrl(): string {
+	const envBase = import.meta.env.VITE_API_BASE_URL;
+	if (envBase) {
+		return envBase;
 	}
 	if (import.meta.env.DEV) {
 		return 'http://localhost:3000';
 	}
 	return '';
-})();
+}
 
-const apiBase = resolvedBase.replace(/\/$/, '');
+const apiBase = getApiBaseUrl().replace(/\/$/, '');
 const API_UPLOAD_ENDPOINT = apiBase ? `${apiBase}/api/campaign/upload` : '/api/campaign/upload';
 
-const app: HTMLElement = document.createElement('section');
-app.id = 'app';
-const logoSrc = new URL('../Logo_BBD_Software.png', import.meta.url).href;
+const appRoot = document.querySelector<HTMLElement>('#app');
+if (!appRoot) {
+	throw new Error('App container not found. Ensure index.html contains #app.');
+}
+appRoot.dataset.ready = 'true';
 
-const hero = document.createElement('header');
-hero.className = 'app-hero';
+const logoImg = document.querySelector<HTMLImageElement>('#app-logo');
+if (logoImg) {
+	logoImg.src = new URL('../Logo_BBD_Software.png', import.meta.url).href;
+}
 
-const logoImg = document.createElement('img');
-logoImg.src = logoSrc;
-logoImg.alt = 'BBD Software logo';
-logoImg.className = 'app-logo';
-hero.appendChild(logoImg);
+const form = document.querySelector<HTMLFormElement>('#upload-form');
+const statusEl = document.querySelector<HTMLParagraphElement>('[data-upload-status]');
+const respPre = document.querySelector<HTMLPreElement>('[data-resp]');
+const titleInput = document.querySelector<HTMLInputElement>('#campaign-title');
+const messageInput = document.querySelector<HTMLTextAreaElement>('#campaign-message');
+const buttonUrlInput = document.querySelector<HTMLInputElement>('#campaign-button-url');
+const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]') ?? null;
 
-const heroText = document.createElement('div');
-heroText.className = 'app-hero__text';
+if (!form || !statusEl || !respPre || !titleInput || !messageInput || !buttonUrlInput || !submitButton) {
+	throw new Error('Upload form markup is missing required elements.');
+}
 
-const title: HTMLElement = document.createElement('h1');
-title.innerText = 'Campaign Manager';
-heroText.appendChild(title);
+form.addEventListener('submit', async (event) => {
+	event.preventDefault();
+	const titleValue = titleInput.value.trim();
+	const messageValue = messageInput.value.trim();
+	const buttonUrlValue = buttonUrlInput.value.trim();
 
-const subtitle: HTMLElement = document.createElement('p');
-subtitle.className = 'app-hero__subtitle';
-subtitle.textContent = 'Plan, preview, and publish campaigns with ease.';
-heroText.appendChild(subtitle);
+	if (!titleValue || !messageValue || !buttonUrlValue) {
+		statusEl.textContent = 'Please complete title, message, and button URL.';
+		return;
+	}
 
-hero.appendChild(heroText);
-app.appendChild(hero);
+	const payload = {
+		title: titleValue,
+		message: messageValue,
+		buttonUrl: buttonUrlValue,
+		targetIdMap: {},
+	};
 
+	submitButton.disabled = true;
+	submitButton.textContent = 'Uploading…';
+	statusEl.textContent = 'Uploading to server…';
 
-const uploadCampaignSection = createUploadCampaignSection();
-app.appendChild(uploadCampaignSection);
-document.body.appendChild(app);
+	try {
+		const response = await uploadCampaign(payload);
+		statusEl.textContent = 'Upload complete ✔';
+		setResp(response);
+		form.reset();
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Failed to upload campaign';
+		statusEl.textContent = message;
+		setResp({ error: message });
+	} finally {
+		submitButton.disabled = false;
+		submitButton.textContent = 'Create Campaign';
+	}
+});
 
-
-
-// Response section 
-const respPre: HTMLPreElement = document.createElement('pre');
-respPre.className = 'resp';
-respPre.textContent = 'No response yet';
-
-const respSection: HTMLElement = document.createElement('section');
-const respHeading: HTMLElement = document.createElement('h2');
-respHeading.innerText = 'Response';
-respSection.appendChild(respHeading);
-respSection.appendChild(respPre);
-app.appendChild(respSection);
-
-
-//Responce
+// Response handling
 let resp: JSONValue | null = null;
 function setResp(value: JSONValue | null): void {
 	resp = value;
@@ -86,126 +98,6 @@ declare global {
 }
 
 window.setResp = setResp;
-
-function createUploadCampaignSection(): HTMLElement {
-	const section = document.createElement('section');
-	section.className = 'upload-section';
-
-	const heading = document.createElement('h2');
-	heading.textContent = 'Upload Campaign';
-	section.appendChild(heading);
-
-	const intro = document.createElement('p');
-	intro.className = 'upload-intro';
-	intro.textContent = 'Fill in the basics and send the campaign to the server in one click.';
-	section.appendChild(intro);
-
-	const form = document.createElement('form');
-	form.className = 'upload-form';
-	section.appendChild(form);
-
-	const fieldset = document.createElement('fieldset');
-	fieldset.className = 'upload-form__fieldset';
-	form.appendChild(fieldset);
-
-	const titleInput = document.createElement('input');
-	titleInput.type = 'text';
-	titleInput.id = 'campaign-title';
-	titleInput.name = 'campaignTitle';
-	titleInput.placeholder = 'Campaign title';
-	fieldset.appendChild(createLabeledControl('Title', titleInput));
-
-	const messageInput = document.createElement('textarea');
-	messageInput.id = 'campaign-message';
-	messageInput.name = 'campaignMessage';
-	messageInput.rows = 4;
-	messageInput.placeholder = 'Message content';
-	fieldset.appendChild(createLabeledControl('Message', messageInput));
-
-	const buttonUrlInput = document.createElement('input');
-	buttonUrlInput.type = 'url';
-	buttonUrlInput.id = 'campaign-button-url';
-	buttonUrlInput.name = 'campaignButtonUrl';
-	buttonUrlInput.placeholder = 'https://example.com';
-	fieldset.appendChild(createLabeledControl('Button URL', buttonUrlInput));
-
-	const actions = document.createElement('footer');
-	actions.className = 'upload-actions';
-	form.appendChild(actions);
-
-	const createButton = document.createElement('button');
-	createButton.type = 'submit';
-	createButton.textContent = 'Create Campaign';
-	actions.appendChild(createButton);
-
-	const status = document.createElement('p');
-	status.className = 'upload-status';
-	status.textContent = 'Awaiting details…';
-	section.appendChild(status);
-
-	form.addEventListener('submit', async (event) => {
-		event.preventDefault();
-		const titleValue = titleInput.value.trim();
-		const messageValue = messageInput.value.trim();
-		const buttonUrlValue = buttonUrlInput.value.trim();
-
-		if (!titleValue || !messageValue || !buttonUrlValue) {
-			status.textContent = 'Please complete title, message, and button URL.';
-			return;
-		}
-
-		const payload = {
-			title: titleValue,
-			message: messageValue,
-			buttonUrl: buttonUrlValue,
-			targetIdMap: {},
-		};
-
-		createButton.disabled = true;
-		createButton.textContent = 'Uploading…';
-		status.textContent = 'Uploading to server…';
-
-		try {
-			const response = await uploadCampaign(payload);
-			status.textContent = 'Upload complete ✔';
-			setResp(response);
-			form.reset();
-		} catch (error) {
-			const message = error instanceof Error ? error.message : 'Failed to upload campaign';
-			status.textContent = message;
-			setResp({ error: message });
-		} finally {
-			createButton.disabled = false;
-			createButton.textContent = 'Create Campaign';
-		}
-	});
-
-	return section;
-
-	function createLabeledControl(
-		labelText: string,
-		control: HTMLInputElement | HTMLTextAreaElement,
-		hint?: string,
-	): HTMLElement {
-		const wrapper = document.createElement('label');
-		wrapper.className = 'input-field';
-
-		const text = document.createElement('span');
-		text.className = 'input-field__label';
-		text.textContent = labelText;
-		wrapper.appendChild(text);
-		wrapper.appendChild(control);
-
-		if (hint) {
-			const helper = document.createElement('small');
-			helper.className = 'input-field__hint';
-			helper.textContent = hint;
-			wrapper.appendChild(helper);
-		}
-
-		return wrapper;
-	}
-}
 
 async function uploadCampaign(payloadBody: Record<string, unknown>): Promise<JSONValue> {
 	const response = await fetch(API_UPLOAD_ENDPOINT, {
