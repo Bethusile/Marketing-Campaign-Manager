@@ -11,6 +11,7 @@ import {
   upload
 } from '../controller/campaignController';
 import { getTarget } from '../controller/targetController';
+import { uploadImagesHandler } from '../handlers/UploadImages';
 
 const router = Router();
 
@@ -40,5 +41,15 @@ router.delete('/deleteCampaign/:id', allowAll, deleteCampaign);
 
 // Target route
 router.get('/getTarget', allowAll, getTarget);
+
+router.post(
+  '/uploadImages',
+  allowAll,
+  upload.fields([
+    { name: 'redacted', maxCount: 1 },
+    { name: 'unredacted', maxCount: 1 },
+  ]),
+  (req, res) => { void uploadImagesHandler(req, res); }
+);
 
 export default router;
