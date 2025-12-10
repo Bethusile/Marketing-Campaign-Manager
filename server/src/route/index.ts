@@ -11,6 +11,7 @@ import {
   upload
 } from '../controller/campaignController';
 import { getTarget } from '../controller/targetController';
+import { uploadCampaignHandler } from '../handlers/uploadCampaign';
 
 const router = Router();
 
@@ -37,6 +38,12 @@ router.put(
   (req, res) => { void updateCampaign(req, res); }
 );
 router.delete('/deleteCampaign/:id', allowAll, deleteCampaign);
+
+router.post(
+  '/campaign/upload',
+  allowAll,
+  uploadCampaignHandler,
+);
 
 // Target route
 router.get('/getTarget', allowAll, getTarget);
