@@ -1,4 +1,17 @@
 #app{
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.resp {
+  white-space: pre-wrap;
+  background: #f7f7f8;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #e1e1e1;
+  overflow: auto;
 }
