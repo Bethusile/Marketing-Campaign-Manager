@@ -10,6 +10,7 @@ import {
   deleteCampaign,
   upload
 } from '../controller/campaignController';
+import { toggleCampaignActive } from '../handlers/campaignStatusHandler';
 import { getTarget } from '../controller/targetController';
 import { getCampaign, getUnredactedImage } from '../handlers/ar';
 import { getRedactedImagesBulk, updateTarget } from '../handlers/postTarget';
@@ -44,6 +45,8 @@ router.delete('/deleteCampaign/:id', allowAll, deleteCampaign);
 
 // Target route
 router.get('/getTarget', allowAll, getTarget);
+// Toggle Campaign Active route
+router.put('/toggleCampaign/:id', allowAll, toggleCampaignActive);
 
 // AR routes
 router.get('/ar/:id', allowAll, (req, res) => { void getCampaign(req, res); });
