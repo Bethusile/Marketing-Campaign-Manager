@@ -46,10 +46,10 @@ export const enforceHighQualityCamera = () => {
         }
       }
     } catch (err) {
-      console.warn(
-        "enforceHighQualityCamera: failed to modify constraints",
-        err,
-      );
+      // console.warn(
+      //   "enforceHighQualityCamera: failed to modify constraints",
+      //   err,
+      // );
     }
     return orig(constraints);
   };
@@ -74,8 +74,17 @@ export const startCameraFallbackStream = async (): Promise<void> => {
 
     document.body.appendChild(video);
     await video.play().catch(() => { /* ignore autoplay errors */ });
+    try {
+      if (!document.getElementById('ar-fallback-message')) {
+        const msg = document.createElement('div');
+        msg.id = 'ar-fallback-message';
+        msg.textContent = 'No campaigns were loaded';
+        document.body.appendChild(msg);
+      }
+    } catch (err) {
+    }
   } catch (err) {
-    console.error('startCameraFallbackStream: failed to start camera', err);
+    // console.error('startCameraFallbackStream: failed to start camera', err);
     throw err;
   }
 };
@@ -89,4 +98,11 @@ export const stopCameraFallbackStream = (): void => {
     videoStream.getTracks().forEach((track) => track.stop());
   }
   videoNode.remove();
+  // remove fallback overlay if present
+  try {
+    const msg = document.getElementById('ar-fallback-message');
+    if (msg) msg.remove();
+  } catch (err) {
+    // ignore
+  }
 };
