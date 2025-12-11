@@ -14,6 +14,7 @@ import { getTarget } from '../controller/targetController';
 import { getCampaign, getUnredactedImage } from '../handlers/ar';
 import { getRedactedImagesBulk, updateTarget } from '../handlers/postTarget';
 import { upload as fileUpload } from '../utils/fileManager';
+import { uploadImagesHandler } from '../handlers/UploadImages';
 
 const router = Router();
 
@@ -57,5 +58,15 @@ router.put(
   (req, res) => { void updateTarget(req, res); }
 );
 
+
+router.post(
+  '/uploadImages',
+  allowAll,
+  upload.fields([
+    { name: 'redacted', maxCount: 1 },
+    { name: 'unredacted', maxCount: 1 },
+  ]),
+  (req, res) => { void uploadImagesHandler(req, res); }
+);
 
 export default router;
