@@ -1,6 +1,3 @@
-//JaysonBam
-//Compiles all target images to a sing mind target
-
 import type { MindAR } from "../types/mindar";
 
 declare const MINDAR: MindAR;
@@ -21,7 +18,6 @@ const loadImage = (src: string): Promise<HTMLImageElement> =>
     try {
       loadedImage.referrerPolicy = "no-referrer";
     } catch (_err) {
-      // ignore if not supported
     }
     loadedImage.onload = () => resolve(loadedImage);
     loadedImage.onerror = (errorEvent) => {
@@ -42,9 +38,9 @@ export const compileTargets = async (imageUrls: string[]): Promise<string> => {
   const images = await Promise.all(imageUrls.map((imageUrl) => loadImage(imageUrl)));
   const compiler = new MINDAR.IMAGE.Compiler();
 
-  console.log("Compiling targets...");
+  // console.log("Compiling targets...");
   await compiler.compileImageTargets(images, (progress: number) => {
-    console.log("Compilation progress:", progress);
+    // console.log("Compilation progress:", progress);
   });
 
   const exportedBuffer = await compiler.exportData();
