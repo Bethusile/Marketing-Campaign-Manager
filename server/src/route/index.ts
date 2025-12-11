@@ -12,6 +12,7 @@ import {
 } from '../controller/campaignController';
 import { toggleCampaignActive } from '../handlers/campaignStatusHandler';
 import { getTarget } from '../controller/targetController';
+import { uploadCampaignHandler } from '../handlers/uploadCampaign';
 import { getImagesHandler } from '../handlers/getImagesHandler';
 import { getCampaign, getUnredactedImage } from '../handlers/ar';
 import { getRedactedImagesBulk, updateTarget } from '../handlers/postTarget';
@@ -43,6 +44,12 @@ router.put(
   (req, res) => { void updateCampaign(req, res); }
 );
 router.delete('/deleteCampaign/:id', allowAll, deleteCampaign);
+
+router.post(
+  '/campaign/upload',
+  allowAll,
+  uploadCampaignHandler,
+);
 
 // Target route
 router.get('/getTarget', allowAll, getTarget);

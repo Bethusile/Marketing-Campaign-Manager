@@ -6,6 +6,48 @@
     <title>campaign_manager</title>
   </head>
   <body>
+    <section id="app">
+      <header class="app-hero">
+        <img id="app-logo" class="app-logo" alt="BBD Software logo" />
+        <div class="app-hero__text">
+          <h1>Campaign Manager</h1>
+          <p class="app-hero__subtitle">Plan, preview, and publish campaigns with ease.</p>
+        </div>
+      </header>
+
+      <section class="upload-section">
+        <h2>Upload Campaign</h2>
+        <p class="upload-intro">Fill in the basics and send the campaign to the server in one click.</p>
+        <form id="upload-form" class="upload-form" novalidate>
+          <fieldset class="upload-form__fieldset">
+            <label class="input-field" for="campaign-title">
+              <span class="input-field__label">Title</span>
+              <input type="text" id="campaign-title" name="campaignTitle" placeholder="Campaign title" required />
+            </label>
+
+            <label class="input-field" for="campaign-message">
+              <span class="input-field__label">Message</span>
+              <textarea id="campaign-message" name="campaignMessage" rows="4" placeholder="Message content" required></textarea>
+            </label>
+
+            <label class="input-field" for="campaign-button-url">
+              <span class="input-field__label">Button URL</span>
+              <input type="url" id="campaign-button-url" name="campaignButtonUrl" placeholder="https://example.com" required />
+            </label>
+          </fieldset>
+          <footer class="upload-actions">
+            <button type="submit">Create Campaign</button>
+          </footer>
+        </form>
+        <p class="upload-status" data-upload-status>Awaiting details…</p>
+      </section>
+
+      <section class="response-section">
+        <h2>Response</h2>
+        <pre class="resp" data-resp>No response yet</pre>
+      </section>
+    </section>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
