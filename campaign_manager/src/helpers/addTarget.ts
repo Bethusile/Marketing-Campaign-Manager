@@ -3,40 +3,18 @@ import { compileTargets } from './genarator';
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
 type SetResp = (value: JSONValue | null) => void;
 
-export const addTargetHelper = (setResp: SetResp): HTMLFormElement => {
+export const addTargetHelper = (setResp: SetResp): void => {
   const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? window.location.origin;
-  const form = document.createElement('form');
-  form.id = 'add-target-form';
+  
+  const form = document.querySelector<HTMLFormElement>('#add-target-form');
+  const campaignInput = document.querySelector<HTMLInputElement>('#target-campaign-id');
+  const imagesInput = document.querySelector<HTMLInputElement>('#target-image-ids');
+  const submit = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
 
-  const heading = document.createElement('h2');
-  heading.innerText = 'Add Target';
-
-  const campaignLabel = document.createElement('label');
-  campaignLabel.innerText = 'Campaign ID:';
-  const campaignInput = document.createElement('input');
-  campaignInput.name = 'campaignId';
-  campaignInput.type = 'text';
-  campaignInput.placeholder = 'campaign id';
-
-  const imagesLabel = document.createElement('label');
-  imagesLabel.innerText = 'Image IDs (comma-separated):';
-  const imagesInput = document.createElement('input');
-  imagesInput.name = 'images';
-  imagesInput.type = 'text';
-  imagesInput.placeholder = 'e.g. 12,34,56';
-
-  const submit = document.createElement('button');
-  submit.type = 'submit';
-  submit.innerText = 'Create & Upload Target';
-
-  form.appendChild(heading);
-  form.appendChild(campaignLabel);
-  form.appendChild(campaignInput);
-  form.appendChild(document.createElement('br'));
-  form.appendChild(imagesLabel);
-  form.appendChild(imagesInput);
-  form.appendChild(document.createElement('br'));
-  form.appendChild(submit);
+  if (!form || !campaignInput || !imagesInput || !submit) {
+    console.error('Add target form elements not found');
+    return;
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -119,8 +97,6 @@ export const addTargetHelper = (setResp: SetResp): HTMLFormElement => {
       submit.disabled = false;
     }
   });
-
-  return form;
 };
 
 export default addTargetHelper;

@@ -72,7 +72,7 @@ form.addEventListener('submit', async (event) => {
 
 	try {
 		const response = await uploadCampaign(payload);
-		statusEl.textContent = 'Upload complete ✔';
+		statusEl.textContent = 'Upload complete ✓';
 		setResp(response);
 		form.reset();
 	} catch (error) {
@@ -85,82 +85,53 @@ form.addEventListener('submit', async (event) => {
 	}
 });
 
-// Response handling
-// Response section 
-// Toggle Campaign Active section
-// you use the campaign ID to toggle its active status
-const toggleSection: HTMLElement = document.createElement('section');
-toggleSection.id = 'toggleCampaignSection';
-const toggleHeading: HTMLElement = document.createElement('h2');
-toggleHeading.innerText = 'Toggle Campaign Active';
-toggleSection.appendChild(toggleHeading);
-const toggleLabel: HTMLLabelElement = document.createElement('label');
-toggleLabel.innerText = 'Campaign ID: ';
-const toggleInput: HTMLInputElement = document.createElement('input');
-toggleInput.type = 'text';
-toggleInput.id = 'toggleCampaignId';
-toggleLabel.appendChild(toggleInput);
-toggleSection.appendChild(toggleLabel);
-const toggleActive: HTMLElement = document.createElement('label');
-toggleActive.innerText = ' Active: ';
-const toggleCheckbox: HTMLInputElement = document.createElement('input');
-toggleCheckbox.type = 'checkbox';
-toggleCheckbox.id = 'toggleIsActive';
-toggleActive.appendChild(toggleCheckbox);
-toggleSection.appendChild(toggleActive);
-const toggleButton: HTMLButtonElement = document.createElement('button');
-toggleButton.innerText = 'Toggle';
-toggleButton.id = 'toggleCampaignButton';
-toggleSection.appendChild(toggleButton);
-appRoot.appendChild(toggleSection);
-// Toggle button event listener
-toggleButton.addEventListener('click', async () => {
-  const campaignId: string = (document.getElementById('toggleCampaignId') as HTMLInputElement).value;
-  const isActive: boolean = (document.getElementById('toggleIsActive') as HTMLInputElement).checked;
-  const result = await updateCampaignStatus(campaignId, isActive); // Call the helper function to update status
-  window.setResp?.(result); // Update the response display
-});
+// Toggle Campaign Active section - now using existing HTML elements
+const toggleButton = document.querySelector<HTMLButtonElement>('#toggleCampaignButton');
+const toggleInput = document.querySelector<HTMLInputElement>('#toggleCampaignId');
+const toggleCheckbox = document.querySelector<HTMLInputElement>('#toggleIsActive');
 
+if (toggleButton && toggleInput && toggleCheckbox) {
+	toggleButton.addEventListener('click', async () => {
+		const campaignId = toggleInput.value;
+		const isActive = toggleCheckbox.checked;
+		const result = await updateCampaignStatus(campaignId, isActive);
+		window.setResp?.(result);
+	});
+}
 
-const getImagesSection: HTMLElement = document.createElement('section');
-const getImagesHeading: HTMLElement = document.createElement('h2');
-getImagesHeading.innerText = 'Get Campaign Images';
-getImagesSection.appendChild(getImagesHeading);
+// Get Campaign Images section - now using existing HTML elements
+const getImagesButton = document.querySelector<HTMLButtonElement>('#getImagesButton');
 
-const getImagesButton: HTMLButtonElement = document.createElement('button');
-getImagesButton.innerText = 'Load Images';
+if (getImagesButton) {
+	getImagesButton.addEventListener('click', async () => {
+		const response = await getImages();
+		setResp(response);
+	});
+}
 
-getImagesButton.addEventListener('click', async () => {
-    const response = await getImages();
-    setResp(response);
-});
-getImagesSection.appendChild(getImagesButton);
-appRoot.appendChild(getImagesSection);
-
-//Responce
 // Response handler
 let resp: JSONValue | null = null;
 
 function setResp(value: JSONValue | null): void {
-  resp = value;
+	resp = value;
 
-  if (resp !== null) {
-    try {
-      // Display server response JSON nicely
-      respPre.textContent = JSON.stringify(resp, null, 2);
-    } catch (_) {
-      respPre.textContent = String(resp);
-    }
-  } else {
-    respPre.textContent = 'No response yet';
-  }
+	if (resp !== null) {
+		try {
+			// Display server response JSON nicely
+			respPre.textContent = JSON.stringify(resp, null, 2);
+		} catch (_) {
+			respPre.textContent = String(resp);
+		}
+	} else {
+		respPre.textContent = 'No response yet';
+	}
 }
 
 // Make it globally accessible
 declare global {
-  interface Window {
-    setResp?: (value: JSONValue | null) => void;
-  }
+	interface Window {
+		setResp?: (value: JSONValue | null) => void;
+	}
 }
 
 window.setResp = setResp;
@@ -194,13 +165,8 @@ function safeParseJson(text: string): JSONValue {
 	}
 }
 
+// Initialize upload images helper - no longer appends, just attaches listeners
+uploadImagesHelper(window.setResp!);
 
-//upload images section
-const uploadForm = uploadImagesHelper(window.setResp!);
-appRoot.appendChild(uploadForm);
-
-// add target (compile & upload) form
-const addTargetForm = addTargetHelper(window.setResp!);
-appRoot.appendChild(addTargetForm);
-
-
+// Initialize add target helper - no longer appends, just attaches listeners
+addTargetHelper(window.setResp!);

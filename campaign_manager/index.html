@@ -9,29 +9,29 @@
     <section id="app">
       <header class="app-hero">
         <img id="app-logo" class="app-logo" alt="BBD Software logo" />
-        <div class="app-hero__text">
+        <section class="app-hero__text">
           <h1>Campaign Manager</h1>
           <p class="app-hero__subtitle">Plan, preview, and publish campaigns with ease.</p>
-        </div>
+        </section>
       </header>
 
-      <section class="upload-section">
+      <section class="upload-section">   
         <h2>Upload Campaign</h2>
         <p class="upload-intro">Fill in the basics and send the campaign to the server in one click.</p>
         <form id="upload-form" class="upload-form" novalidate>
           <fieldset class="upload-form__fieldset">
             <label class="input-field" for="campaign-title">
-              <span class="input-field__label">Title</span>
+              <section class="input-field__label">Title</section>
               <input type="text" id="campaign-title" name="campaignTitle" placeholder="Campaign title" required />
             </label>
 
             <label class="input-field" for="campaign-message">
-              <span class="input-field__label">Message</span>
+              <section class="input-field__label">Message</section>
               <textarea id="campaign-message" name="campaignMessage" rows="4" placeholder="Message content" required></textarea>
             </label>
 
             <label class="input-field" for="campaign-button-url">
-              <span class="input-field__label">Button URL</span>
+              <section class="input-field__label">Button URL</section>
               <input type="url" id="campaign-button-url" name="campaignButtonUrl" placeholder="https://example.com" required />
             </label>
           </fieldset>
@@ -42,6 +42,87 @@
         <p class="upload-status" data-upload-status>Awaiting details…</p>
       </section>
 
+      <!-- Toggle Campaign Active section -->
+      <section class="upload-section" id="toggleCampaignSection">
+        <h2>Toggle Campaign Active</h2>
+        <form class="upload-form">
+          <fieldset class="upload-form__fieldset">
+            <label class="input-field" for="toggleCampaignId">
+              <section class="input-field__label">Campaign ID</section>
+              <input type="text" id="toggleCampaignId" placeholder="Enter campaign ID" />
+            </label>
+            
+            <label class="input-field" for="toggleIsActive">
+              <section class="input-field__label">Active Status</section>
+              <input type="checkbox" id="toggleIsActive" />
+            </label>
+          </fieldset>
+          <footer class="upload-actions">
+            <button type="button" id="toggleCampaignButton">Toggle</button>
+          </footer>
+        </form>
+      </section>
+
+      <!-- Get Campaign Images section -->
+      <section class="upload-section" id="getImagesSection">
+        <h2>Get Campaign Images</h2>
+        <p class="upload-intro">Load all available campaign images from the server.</p>
+        <footer class="upload-actions">
+          <button type="button" id="getImagesButton">Load Images</button>
+        </footer>
+      </section>
+
+      <!-- Upload Images section -->
+      <section class="upload-section" id="upload-images-section">
+        <h2>Upload Images</h2>
+        <p class="upload-intro">Upload redacted and unredacted images for your campaign.</p>
+        <form id="upload-images-form" class="upload-form" enctype="multipart/form-data">
+          <fieldset class="upload-form__fieldset">
+            <label class="input-field" for="image-title">
+              <section class="input-field__label">Title</section>
+              <input type="text" name="title" id="image-title" placeholder="Campaign Title" required />
+            </label>
+            
+            <label class="input-field" for="redacted-image">
+              <section class="input-field__label">Redacted Image</section>
+              <input type="file" name="redacted" id="redacted-image" accept="image/*" required />
+            </label>
+            
+            <label class="input-field" for="unredacted-image">
+              <section class="input-field__label">Unredacted Image</section>
+              <input type="file" name="unredacted" id="unredacted-image" accept="image/*" required />
+            </label>
+          </fieldset>
+          <footer class="upload-actions">
+            <button type="submit">Upload</button>
+          </footer>
+        </form>
+      </section>
+
+      <!-- Add Target section -->
+      <section class="upload-section" id="add-target-section">
+        <h2>Add Target</h2>
+        <p class="upload-intro">Compile and upload target images for AR campaign tracking.</p>
+        <form id="add-target-form" class="upload-form">
+          <fieldset class="upload-form__fieldset">
+            <label class="input-field" for="target-campaign-id">
+              <section class="input-field__label">Campaign ID</section>
+              <input type="text" name="campaignId" id="target-campaign-id" placeholder="campaign id" required />
+            </label>
+            
+            <label class="input-field" for="target-image-ids">
+              <section class="input-field__label">Image IDs (comma-separated)</section>
+              <input type="text" name="images" id="target-image-ids" placeholder="e.g. 12,34,56" required />
+              <section class="input-field__hint">Enter multiple image IDs separated by commas</section>
+            </label>
+          </fieldset>
+          <footer class="upload-actions">
+            <button type="submit">Create & Upload Target</button>
+          </footer>
+        </form>
+      </section>
+
+      <!-- Response section -->
       <section class="response-section">
         <h2>Response</h2>
         <pre class="resp" data-resp>No response yet</pre>
