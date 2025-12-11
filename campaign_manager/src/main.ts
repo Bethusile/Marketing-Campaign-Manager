@@ -1,3 +1,6 @@
+import './style.css'
+// Import the getImages function
+import { getImages } from './helpers/getImages';
 import './style.css';
 import { updateCampaignStatus } from './helpers/campaignStatusHelper';
 import { uploadImagesHelper } from './helpers/uploadImagesHelper';
@@ -83,6 +86,7 @@ form.addEventListener('submit', async (event) => {
 });
 
 // Response handling
+// Response section 
 // Toggle Campaign Active section
 // you use the campaign ID to toggle its active status
 const toggleSection: HTMLElement = document.createElement('section');
@@ -128,6 +132,23 @@ respHeading.innerText = 'Response';
 respSection.appendChild(respHeading);
 respSection.appendChild(respPre);
 
+
+const getImagesSection: HTMLElement = document.createElement('section');
+const getImagesHeading: HTMLElement = document.createElement('h2');
+getImagesHeading.innerText = 'Get Campaign Images';
+getImagesSection.appendChild(getImagesHeading);
+
+const getImagesButton: HTMLButtonElement = document.createElement('button');
+getImagesButton.innerText = 'Load Images';
+
+getImagesButton.addEventListener('click', async () => {
+    const response = await getImages();
+    setResp(response);
+});
+getImagesSection.appendChild(getImagesButton);
+app.appendChild(getImagesSection);
+
+//Responce
 // Response handler
 let resp: JSONValue | null = null;
 

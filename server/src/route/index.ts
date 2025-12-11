@@ -13,6 +13,7 @@ import {
 import { toggleCampaignActive } from '../handlers/campaignStatusHandler';
 import { getTarget } from '../controller/targetController';
 import { uploadCampaignHandler } from '../handlers/uploadCampaign';
+import { getImagesHandler } from '../handlers/getImagesHandler';
 import { getCampaign, getUnredactedImage } from '../handlers/ar';
 import { getRedactedImagesBulk, updateTarget } from '../handlers/postTarget';
 import { upload as fileUpload } from '../utils/fileManager';
@@ -78,5 +79,8 @@ router.post(
   ]),
   (req, res) => { void uploadImagesHandler(req, res); }
 );
+
+// Get Images route
+router.get('/getImagesHandler', allowAll, getImagesHandler);
 
 export default router;
