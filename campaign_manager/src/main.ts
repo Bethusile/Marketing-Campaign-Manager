@@ -1,7 +1,7 @@
 import './style.css'
 // Import the getImages function
 import { getImages } from './helpers/getImages';
-import './style.css';
+// (styles already imported above)
 import { updateCampaignStatus } from './helpers/campaignStatusHelper';
 import { uploadImagesHelper } from './helpers/uploadImagesHelper';
 import { addTargetHelper } from './helpers/addTarget';
@@ -29,7 +29,7 @@ const appRoot = document.querySelector<HTMLElement>('#app');
 if (!appRoot) {
 	throw new Error('App container not found. Ensure index.html contains #app.');
 }
-appRoot.dataset.ready = 'true';
+appRoot.dataset.ready = 'true';                                         
 
 const logoImg = document.querySelector<HTMLImageElement>('#app-logo');
 if (logoImg) {
@@ -38,7 +38,7 @@ if (logoImg) {
 
 const form = document.querySelector<HTMLFormElement>('#upload-form');
 const statusEl = document.querySelector<HTMLParagraphElement>('[data-upload-status]');
-const respPre = document.querySelector<HTMLPreElement>('[data-resp]');
+const respPre = document.querySelector<HTMLPreElement>('[data-resp]')!;
 const titleInput = document.querySelector<HTMLInputElement>('#campaign-title');
 const messageInput = document.querySelector<HTMLTextAreaElement>('#campaign-message');
 const buttonUrlInput = document.querySelector<HTMLInputElement>('#campaign-button-url');
@@ -112,7 +112,7 @@ const toggleButton: HTMLButtonElement = document.createElement('button');
 toggleButton.innerText = 'Toggle';
 toggleButton.id = 'toggleCampaignButton';
 toggleSection.appendChild(toggleButton);
-app.appendChild(toggleSection);
+appRoot.appendChild(toggleSection);
 // Toggle button event listener
 toggleButton.addEventListener('click', async () => {
   const campaignId: string = (document.getElementById('toggleCampaignId') as HTMLInputElement).value;
@@ -120,17 +120,6 @@ toggleButton.addEventListener('click', async () => {
   const result = await updateCampaignStatus(campaignId, isActive); // Call the helper function to update status
   window.setResp?.(result); // Update the response display
 });
-
-// Response section
-const respPre: HTMLPreElement = document.createElement('pre');
-respPre.className = 'resp';
-respPre.textContent = 'No response yet';
-
-const respSection: HTMLElement = document.createElement('section');
-const respHeading: HTMLElement = document.createElement('h2');
-respHeading.innerText = 'Response';
-respSection.appendChild(respHeading);
-respSection.appendChild(respPre);
 
 
 const getImagesSection: HTMLElement = document.createElement('section');
@@ -146,7 +135,7 @@ getImagesButton.addEventListener('click', async () => {
     setResp(response);
 });
 getImagesSection.appendChild(getImagesButton);
-app.appendChild(getImagesSection);
+appRoot.appendChild(getImagesSection);
 
 //Responce
 // Response handler
@@ -208,12 +197,10 @@ function safeParseJson(text: string): JSONValue {
 
 //upload images section
 const uploadForm = uploadImagesHelper(window.setResp!);
-app.appendChild(uploadForm);
+appRoot.appendChild(uploadForm);
 
 // add target (compile & upload) form
 const addTargetForm = addTargetHelper(window.setResp!);
-app.appendChild(addTargetForm);
-
-app.appendChild(respSection);
+appRoot.appendChild(addTargetForm);
 
 
