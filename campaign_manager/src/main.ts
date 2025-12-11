@@ -1,5 +1,7 @@
 import './style.css';
 import { updateCampaignStatus } from './helpers/campaignStatusHelper';
+import { uploadImagesHelper } from './helpers/uploadImagesHelper';
+
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
 
@@ -44,7 +46,7 @@ toggleButton.addEventListener('click', async () => {
   window.setResp?.(result); // Update the response display
 });
 
-// Response section 
+// Response section
 const respPre: HTMLPreElement = document.createElement('pre');
 respPre.className = 'resp';
 respPre.textContent = 'No response yet';
@@ -54,31 +56,39 @@ const respHeading: HTMLElement = document.createElement('h2');
 respHeading.innerText = 'Response';
 respSection.appendChild(respHeading);
 respSection.appendChild(respPre);
-app.appendChild(respSection);
 
-
-//Responce
+// Response handler
 let resp: JSONValue | null = null;
+
 function setResp(value: JSONValue | null): void {
-	resp = value;
-	if (resp !== null) {
-		try {
-			respPre.textContent = JSON.stringify(resp, null, 2);
-		} catch (_) {
-			respPre.textContent = String(resp);
-		}
-	} else {
-		respPre.textContent = 'No response yet';
-	}
+  resp = value;
+
+  if (resp !== null) {
+    try {
+      // Display server response JSON nicely
+      respPre.textContent = JSON.stringify(resp, null, 2);
+    } catch (_) {
+      respPre.textContent = String(resp);
+    }
+  } else {
+    respPre.textContent = 'No response yet';
+  }
 }
 
+// Make it globally accessible
 declare global {
-	interface Window {
-		setResp?: (value: JSONValue | null) => void;
-	}
+  interface Window {
+    setResp?: (value: JSONValue | null) => void;
+  }
 }
 
 window.setResp = setResp;
 
+
+//upload images section
+const uploadForm = uploadImagesHelper(window.setResp!);
+app.appendChild(uploadForm);
+
+app.appendChild(respSection);
 
 
