@@ -1,6 +1,9 @@
 import './style.css';
 import { updateCampaignStatus } from './helpers/campaignStatusHelper';
 import { uploadImagesHelper } from './helpers/uploadImagesHelper';
+import { addTargetHelper } from './helpers/addTarget';
+import './vendor/aframe.min.js'
+import './vendor/mindar-image-aframe.prod.js'
 
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
@@ -88,6 +91,10 @@ window.setResp = setResp;
 //upload images section
 const uploadForm = uploadImagesHelper(window.setResp!);
 app.appendChild(uploadForm);
+
+// add target (compile & upload) form
+const addTargetForm = addTargetHelper(window.setResp!);
+app.appendChild(addTargetForm);
 
 app.appendChild(respSection);
 
