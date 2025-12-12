@@ -126,8 +126,8 @@ export async function getTarget(): Promise<Target> {
   return res.data;
 }
 
-export async function uploadCampaignSimple(title: string, message: string, buttonUrl: string): Promise<any> {
-  const body = { title, message, buttonUrl };
+export async function uploadCampaignSimple(title: string, message: string, buttonUrl: string, isActive?: boolean): Promise<any> {
+  const body = { title, message, buttonUrl, isActive };
   const res: AxiosResponse<any> = await api.post('/campaign/upload', body, {
     headers: { 'Content-Type': 'application/json' },
   });
