@@ -125,3 +125,11 @@ export async function getTarget(): Promise<Target> {
   const res: AxiosResponse<Target> = await api.get('/getTarget');
   return res.data;
 }
+
+export async function uploadCampaignSimple(title: string, message: string, buttonUrl: string): Promise<any> {
+  const body = { title, message, buttonUrl };
+  const res: AxiosResponse<any> = await api.post('/campaign/upload', body, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  return res.data;
+}

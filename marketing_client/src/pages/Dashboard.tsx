@@ -98,6 +98,7 @@ const Dashboard: React.FC = () => {
           sortKey={sortKey}
           setSortKey={setSortKey}
           onUploadClick={() => navigate('/images/new')}
+          onAddCampaignClick={() => navigate('/campaigns/new')}
         />
 
         <Box
