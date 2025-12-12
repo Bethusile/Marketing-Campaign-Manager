@@ -23,6 +23,11 @@ video {
   transform: translateX(-50%);
   width: 92%;
   max-width: 26.875rem;
+  box-sizing: border-box;
+
+  /* Ensure long words/wide content don't overflow the rounded edges */
+  overflow-wrap: break-word;
+  word-break: break-word;
 
   /* Semi-transparent black background */
   background: rgba(0, 0, 0, 0.5);
@@ -58,6 +63,32 @@ video {
   color: white;
   margin-bottom: 1.25rem;
   line-height: 1.25;
+}
+
+/* Mobile adjustments: slightly smaller text and guarantee safe insets */
+@media (max-width: 480px) {
+  #dropdown-message {
+    /* use inset spacing instead of centering transform so it never touches screen edges */
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    width: auto;
+    max-width: none;
+    padding: 1rem;
+    top: 0.75rem;
+    border-radius: 0.75rem;
+  }
+
+  #dropdown-message .message-text {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  #dropdown-message .dropdown-button {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 
 /* If user inserts <span class="highlight-red"> */
