@@ -9,7 +9,11 @@ declare const AFRAME: AFrameStatic;
 
 const updateOrReplaceDropdown = (message: string, buttonUrl?: string) => {
   const existingDropdownEl = document.getElementById("dropdown-message");
-  if (existingDropdownEl) existingDropdownEl.remove();
+  // If a dropdown already exists, keep it and ignore new requests
+  if (existingDropdownEl) {
+    existingDropdownEl.classList.add("visible");
+    return existingDropdownEl;
+  }
 
   const newEl = createDropdownMessage(message, buttonUrl || "");
   document.body.appendChild(newEl);
@@ -107,9 +111,8 @@ const registerComponents = () => {
 
           if (!aImageEl || !overlayUrl) return;
 
-          aImageEl.setAttribute("src", overlayUrl);
-          aImageEl.setAttribute("visible", "true");
-
+          // Wait for the A-Frame material texture to be loaded before making the image visible
+          let textureFallbackTimer: number | undefined;
           const onTexture = () => {
             try {
               const elWithComponents = aImageEl as unknown as AFrameEntity & { components?: { material?: { material?: { map?: { image?: TexImage | null } } } } };
@@ -127,9 +130,19 @@ const registerComponents = () => {
             } catch (_e) {
               // ignore sizing errors
             }
+            try { aImageEl.setAttribute("visible", "true"); } catch (_e) {}
+            if (textureFallbackTimer !== undefined) clearTimeout(textureFallbackTimer);
             aImageEl.removeEventListener("materialtextureloaded", onTexture);
           };
           aImageEl.addEventListener("materialtextureloaded", onTexture);
+
+          // Small fallback: if the event doesn't fire, show the image after 2s to avoid permanent invisibility
+          textureFallbackTimer = window.setTimeout(() => {
+            try { aImageEl.setAttribute("visible", "true"); } catch (_e) {}
+          }, 2000);
+
+          // Set the source after attaching listener so we don't miss the event
+          aImageEl.setAttribute("src", overlayUrl);
 
           setTimeout(() => updateOrReplaceDropdown(campaignPayload.message || "", campaignPayload.buttonUrl || ""), 3000);
         } catch (err) {
