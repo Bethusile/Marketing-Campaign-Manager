@@ -30,6 +30,14 @@ export type Campaign = {
   updatedAt: string;
 };
 
+export type CampaignImage = {
+  id: number;
+  title: string;
+  redactedImageUrl: string;
+  unredactedImageUrl: string;
+  createdAt: string;
+};
+
 export type Target = {
   target_url: string;
 };
@@ -66,6 +74,12 @@ const createCampaignFormData = (input: CampaignForm): FormData => {
 export async function getAllCampaigns(): Promise<Campaign[]> {
   const res: AxiosResponse<Campaign[]> = await api.get('/getCampaign/all');
   return res.data;
+}
+
+export async function getAllImages(): Promise<CampaignImage[]> {
+  const res: AxiosResponse<any> = await api.get('/getImagesHandler');
+  // server responds { success: true, images: [...] }
+  return (res.data && res.data.images) as CampaignImage[];
 }
 
 export async function getActiveCampaigns(): Promise<Campaign[]> {
