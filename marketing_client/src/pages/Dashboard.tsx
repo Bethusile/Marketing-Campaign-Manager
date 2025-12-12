@@ -97,7 +97,7 @@ const Dashboard: React.FC = () => {
           setSearchTerm={setSearchTerm}
           sortKey={sortKey}
           setSortKey={setSortKey}
-          onUploadClick={() => navigate('/campaign/new')}
+          onUploadClick={() => navigate('/images/new')}
         />
 
         <Box

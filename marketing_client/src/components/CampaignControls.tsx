@@ -69,7 +69,7 @@ const CampaignControls: React.FC<Props> = ({
 
       {onUploadClick && (
         <Button variant="contained" startIcon={<CloudUploadIcon />} onClick={onUploadClick} sx={{ bgcolor: ACCENT_RED }}>
-          Upload Campaign
+          Upload Images
         </Button>
       )}
     </Box>

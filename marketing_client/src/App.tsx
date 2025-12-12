@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { red } from '@mui/material/colors';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Campaign from './pages/Campaign';
+import Images from './pages/Images';
 import { Navigate as RRNavigate } from 'react-router-dom';
 
 function App() {
@@ -30,9 +30,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/campaign" element={<RRNavigate to="/campaign/new" replace />} />
-          <Route path="/campaign/new" element={<Campaign />} />
-          <Route path="/campaign/:id" element={<Campaign />} />
+          <Route path="/images" element={<RRNavigate to="/images/new" replace />} />
+          <Route path="/images/new" element={<Images />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

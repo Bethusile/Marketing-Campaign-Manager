@@ -79,14 +79,33 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image
 
   // Trigger hidden input click
   const onButtonClick = () => {
+    // clear previous value so selecting the same file fires change event
+    try {
+      if (inputRef.current) inputRef.current.value = '';
+    } catch (e) {
+      // ignore
+    }
     inputRef.current?.click();
   };
 
-  const inputId = `file-input-${fileType || 'upload'}`;
+  // sanitize id to avoid spaces/special chars
+  const safeType = (fileType || 'upload').toString().replace(/\s+/g, '-').toLowerCase();
+  const inputId = `file-input-${safeType}`;
 
   return (
     <Box sx={{ width: '100%', mt: 2 }}>
-      
+      {/* Hidden input always present so replace/trigger works reliably */}
+      <input
+        ref={inputRef}
+        id={inputId}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleChange}
+        onClick={() => { try { if (inputRef.current) inputRef.current.value = ''; } catch (e) {} }}
+        aria-label={`Upload ${fileType} file`}
+      />
+
       {/* 1. Drag & Drop Zone or Existing Image */}
       {!selectedFile && !existingImageUrl && (
         <Paper
@@ -110,16 +129,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image
           }}
           onClick={onButtonClick}
         >
-          <input
-            ref={inputRef}
-            id={inputId}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleChange}
-            aria-label={`Upload ${fileType} file`}
-          />
-          
           <CloudUploadIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 1 }} />
           <Typography variant="h6" color="text.primary">
             {/* 3. Used correctly inside JSX */}
@@ -128,8 +137,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fileType = "Image
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             or click to browse
           </Typography>
-          <Box component="label" htmlFor={inputId} sx={{ cursor: 'pointer' }}>
-            <Button variant="contained" component="span">
+          <Box sx={{ cursor: 'pointer' }}>
+            <Button variant="contained" component="span" onClick={onButtonClick}>
               Upload File
             </Button>
           </Box>

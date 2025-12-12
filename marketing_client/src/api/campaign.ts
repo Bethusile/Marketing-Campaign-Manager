@@ -82,6 +82,18 @@ export async function getAllImages(): Promise<CampaignImage[]> {
   return (res.data && res.data.images) as CampaignImage[];
 }
 
+export async function uploadImagePair(title: string, redacted?: File, unredacted?: File): Promise<{ id: number; title: string; message?: string }> {
+  const fd = new FormData();
+  if (title) fd.append('title', title);
+  if (redacted) fd.append('redacted', redacted, redacted.name);
+  if (unredacted) fd.append('unredacted', unredacted, unredacted.name);
+
+  const res: AxiosResponse<any> = await api.post('/uploadImages', fd, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+}
+
 export async function getActiveCampaigns(): Promise<Campaign[]> {
   const res: AxiosResponse<Campaign[]> = await api.get('/getCampaign/active');
   return res.data;
