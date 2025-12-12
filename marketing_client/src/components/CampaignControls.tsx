@@ -14,12 +14,14 @@ interface Props {
   sortKey: 'newest' | 'oldest' | 'alpha';
   setSortKey: (v: 'newest' | 'oldest' | 'alpha') => void;
   onUploadClick?: () => void;
+  onAddCampaignClick?: () => void;
 }
 
 const CampaignControls: React.FC<Props> = ({
   searchTerm, setSearchTerm,
   sortKey, setSortKey,
-  onUploadClick
+  onUploadClick,
+  onAddCampaignClick,
 }) => {
   const theme = useTheme();
   const isLight = theme.palette.mode === 'light';
@@ -70,6 +72,11 @@ const CampaignControls: React.FC<Props> = ({
       {onUploadClick && (
         <Button variant="contained" startIcon={<CloudUploadIcon />} onClick={onUploadClick} sx={{ bgcolor: ACCENT_RED }}>
           Upload Images
+        </Button>
+      )}
+      {onAddCampaignClick && (
+        <Button variant="outlined" onClick={onAddCampaignClick} sx={{ borderColor: ACCENT_RED, color: ACCENT_RED }}>
+          Add Campaign
         </Button>
       )}
     </Box>
