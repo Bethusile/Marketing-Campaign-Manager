@@ -38,31 +38,56 @@ const ImageCard: React.FC<Props> = ({ image, onCardClick }) => {
         }}
       >
         <Box
-          component="img"
-          src={
-            resolvePath(image.unredactedImageUrl)
-            || resolvePath(image.redactedImageUrl)
-            || 'https://placehold.co/600x450/334155/ffffff?text=No+Image'
-          }
-          alt={`${image.title} target`}
-          loading="lazy"
-          sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block', pointerEvents: 'none' }}
-          onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.src = 'https://placehold.co/600x450/333333/ffffff?text=Image+Not+Found'; }}
-        />
+  component="img"
+  src={
+    resolvePath(image.redactedImageUrl)
+    || resolvePath(image.unredactedImageUrl)
+    || 'https://placehold.co/600x450/334155/ffffff?text=No+Image'
+  }
+  alt={`${image.title} redacted`}
+  loading="lazy"
+  sx={{
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    display: 'block',
+    pointerEvents: 'none'
+  }}
+  onError={(e) => {
+    e.currentTarget.src =
+      'https://placehold.co/600x450/333333/ffffff?text=Image+Not+Found';
+  }}
+/>
 
-        <Box
-          component="img"
-          src={
-            resolvePath(image.redactedImageUrl)
-            || resolvePath(image.unredactedImageUrl)
-            || 'https://placehold.co/600x450/334155/ffffff?text=No+Image'
-          }
-          alt={`${image.title} overlay`}
-          className="overlay-img"
-          loading="lazy"
-          sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block', opacity: 0, transition: 'opacity 600ms ease', pointerEvents: 'none' }}
-          onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.src = 'https://placehold.co/600x450/333333/ffffff?text=Image+Not+Found'; }}
-        />
+<Box
+  component="img"
+  src={
+    resolvePath(image.unredactedImageUrl)
+    || resolvePath(image.redactedImageUrl)
+    || 'https://placehold.co/600x450/334155/ffffff?text=No+Image'
+  }
+  alt={`${image.title} unredacted`}
+  className="overlay-img"
+  loading="lazy"
+  sx={{
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    display: 'block',
+    opacity: 0,
+    transition: 'opacity 600ms ease',
+    pointerEvents: 'none'
+  }}
+  onError={(e) => {
+    e.currentTarget.src =
+      'https://placehold.co/600x450/333333/ffffff?text=Image+Not+Found';
+  }}
+/>
+
       </Box>
 
       <CardContent sx={{ flexGrow: 1 }}>
