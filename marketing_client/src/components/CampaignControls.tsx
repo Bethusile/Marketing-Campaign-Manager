@@ -11,8 +11,6 @@ import { ACCENT_RED } from '../styles/themeConstants';
 interface Props {
   searchTerm: string;
   setSearchTerm: (v: string) => void;
-  filterStatus: 'all' | 'Active' | 'Inactive';
-  setFilterStatus: (v: 'all' | 'Active' | 'Inactive') => void;
   sortKey: 'newest' | 'oldest' | 'alpha';
   setSortKey: (v: 'newest' | 'oldest' | 'alpha') => void;
   onUploadClick?: () => void;
@@ -20,7 +18,6 @@ interface Props {
 
 const CampaignControls: React.FC<Props> = ({
   searchTerm, setSearchTerm,
-  filterStatus, setFilterStatus,
   sortKey, setSortKey,
   onUploadClick
 }) => {
@@ -53,20 +50,7 @@ const CampaignControls: React.FC<Props> = ({
         }}
       />
 
-      <Select
-        value={filterStatus}
-        onChange={(e) => setFilterStatus(e.target.value as Props['filterStatus'])}
-        sx={{
-          color: textColor,
-          background: bgColor,
-          borderRadius: '50px',
-          minWidth: 140
-        }}
-      >
-        <MenuItem value="all">All Status</MenuItem>
-        <MenuItem value="Active">Active</MenuItem>
-        <MenuItem value="Inactive">Inactive</MenuItem>
-      </Select>
+      {/* status filter removed for image-only dashboard */}
 
       <Select
         value={sortKey}
