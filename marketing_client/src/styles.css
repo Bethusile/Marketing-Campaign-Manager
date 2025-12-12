@@ -1,116 +1,58 @@
+:root {
+  --bg-gradient: linear-gradient(135deg, #f5f5f5, #fafafa);
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-border: 1px solid #e0e0e0;
+  --border-gradient: linear-gradient(135deg, rgba(0,0,0,0.2), rgba(0,0,0,0.05), rgba(0,0,0,0.15));
+  --text-color: #000000;
+  --accent-color: #1976d2;
+}
+
 .loginContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--bg-gradient);
-  background-size: 300% 300%;
-  animation: gradientShift 8s ease infinite;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  min-height: 100vh;
 }
 
 .loginCard {
-  padding: 60px 48px;
-  width: 520px;
-  border-radius: 24px;
+  padding: 3.75rem 3rem;
+  width: 32.5rem;
+  border-radius: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
-  backdrop-filter: blur(12px);
+  gap: 1.75rem;
+  backdrop-filter: blur(0.75rem);
   background: var(--card-bg);
-  border: 2px solid transparent;
+  border: 0.125rem solid transparent;
   background-clip: padding-box;
   position: relative;
-  animation: floaty 3.5s ease-in-out infinite;
-  box-shadow: none !important;
 }
-
-.loginCard::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 18px;
-  padding: 2px;
-  background: var(--border-gradient);
-  background-size: 300% 300%;
-  animation: borderGradientShift 8s ease infinite;
-  pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes borderGradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes floaty {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-  100% { transform: translateY(0px); }
-}
-
 
 .welcome {
   font-size: 1.7rem;
   font-weight: 700;
-  color: var(--text-color);
   white-space: normal;
   display: block;
   text-align: center;
-  transform-origin: left center;
-  transform: scaleX(0);
-  animation: typing 1.4s steps(24) forwards;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
+  margin: 0;
 }
 
 .tagline {
-  font-size: 0.95rem;
-  font-weight: 400;
-  color: var(--text-color);
-  opacity: 0.75;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
   margin: 0;
-  animation: fadeInTagline 0.8s ease forwards 1.4s;
-}
-
-@keyframes fadeInTagline {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 0.75;
-    transform: translateY(0);
-  }
-}
-
-@keyframes typing {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-.welcome.with-cursor {
-  border-right: 3px solid var(--accent-color);
-  animation: typing 1.4s steps(24) forwards, blink 0.7s step-end infinite 1.4s;
-  padding-right: 4px;
-}
-
-@keyframes blink {
-  50% { border-right-color: transparent; }
+  line-height: 1.5;
+  padding: 2rem 3rem 1rem 3rem;
 }
 
 .logo {
-  width: 4rem;
-  max-width: 4rem;
-  height: 2rem;
+  width: 11.25rem;
+  max-width: 100%;
+  height: auto;
   display: block;
-  margin: 0 auto 20px auto;
+  margin: 0 auto 1.25rem auto;
   border-radius: 0;
   box-shadow: none;
   background: transparent;
@@ -127,47 +69,49 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
-.button {
-  margin-top: 16px;
-  padding: 14px 32px;
-  font-weight: 600;
-  font-size: 1rem;
-  display: flex;
-  position: relative;
-  overflow: hidden;
-  border-radius: 50px;
-  align-items: center;
-  gap: 10px;
-  border: solid 2px var(--accent-color);
-  outline: none;
+.MuiButton-root.googleButton {
+  border-radius: 3rem;
+  border: 0.15rem solid red;
   background: white;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  letter-spacing: 0.3px;
+  color: black;
+  font-weight: 600;
 }
 
-.button:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 30px rgba(211, 47, 47, 0.4), 0 12px 35px var(--accent-color);
+.MuiButton-root.googleButton:hover {
+  transform: translateY(0.125rem);
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.15);
   background-color: var(--accent-color);
   color: white;
 }
 
-.svg { height: 25px; margin-right: 10px; z-index: 6; }
+.googleButton:active {
+  transform: translateY(0);
+}
 
-.button:hover { animation: text forwards 0.3s; }
-@keyframes text { from { color: black; } to { color: white; } }
-.button:hover::before,
-.button:hover::after { content: ""; position: absolute; top: 50%; left: 9%; transform: translate(-50%, -50%); border-radius: 300px; }
-.button:hover::before { animation: wave1 2.5s ease-in-out forwards; }
-.button:hover::after { animation: wave2 2.5s ease-in-out forwards; }
-@keyframes wave1 { 0%,1% { z-index:1; background:#EB4335; width:0; height:0; opacity:1; } 25% { width:800px; height:800px; } 26% { z-index:3; background:#34A853; width:0; height:0; } 50%,70%,100% { width:800px; height:800px; } }
-@keyframes wave2 { 0%,11% { z-index:2; background:#FBBC05; width:0; height:0; opacity:1; } 35%,39% { width:800px; height:800px; } 40% { z-index:4; background:#4285F4; width:0; height:0; } 64%,100% { width:800px; height:800px; } }
-.button:hover .red { animation: disappear .1s forwards .1s; }
-.button:hover .yellow { animation: disappear .1s forwards .3s; }
-.button:hover .green { animation: disappear .1s forwards .7s; }
-.button:hover .blue { animation: disappear .1s forwards 1.1s; }
-@keyframes disappear { from { filter: brightness(1); } to { filter: brightness(100); } }
+.googleButton .MuiSvgIcon-root {
+  color: #ff2d1d;
+}
+
+.googleButton:hover .MuiSvgIcon-root {
+  filter: brightness(0) invert(1);
+}
+
+.light-logo {
+  display: none;
+}
+
+.dark-logo {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  .light-logo {
+    display: block;
+  }
+  .dark-logo {
+    display: none;
+  }
+}
