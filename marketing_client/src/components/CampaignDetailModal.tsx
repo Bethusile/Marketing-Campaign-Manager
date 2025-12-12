@@ -5,14 +5,12 @@ import {
   Modal,
   Box,
   Typography,
-  IconButton,
   Divider,
   Chip,
   Button,
   CardMedia,
   useTheme,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import type { Campaign } from '../api/campaign';
 import { StyledModalBox } from '../styles/sharedStyles';
 import { ACCENT_RED } from '../styles/themeConstants';
@@ -47,6 +45,11 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
     navigate(`/campaign/${campaign.id}`);
   };
 
+  const imageUrl1 = resolvePath(campaign.overlay_url); 
+  const imageUrl2 = resolvePath(campaign.target_url);
+  
+  const fallbackImage = 'https://placehold.co/400x300/333333/ffffff?text=Image+Error';
+
   return (
     <Modal open={open} onClose={onClose}>
       <StyledModalBox
@@ -66,29 +69,85 @@ const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, ope
           <Typography variant="body2" color={isLight ? '#555' : '#ccc'}>
             Uploaded: {campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown'}
           </Typography>
-          <IconButton onClick={onClose} sx={{ color: ACCENT_RED }}>
-            <CloseIcon fontSize="large" />
-          </IconButton>
+          
         </Box>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
-          <Box sx={{ flex: '1 1 50%', minWidth: 0 }}>
-            <CardMedia
-              component="img"
-              image={resolvePath(campaign.overlay_url) || resolvePath(campaign.target_url) || 'https://placehold.co/600x450/333333/ffffff?text=Image+Error'}
-              alt={campaign.title}
-              sx={{
-                borderRadius: 2,
-                width: '100%',
-                height: 'auto',
-                maxHeight: { xs: 240, md: 360 },
-                objectFit: 'cover',
+
+        {/* --- Image and Details Section --- */}
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', md: 'row' }, 
+            gap: 3 
+          }}
+        >
+          
+          {/* IMAGE CONTAINER */}
+          <Box 
+            sx={{ 
+              flex: '1 1 50%', 
+              minWidth: 0, 
+            }}
+          >
+            {/* Image 1: overlay_url */}
+            <Box 
+              mb={3} 
+              sx={{ 
+                // ADDED: Red bottom border to the image frame
+                borderBottom: `2px solid ${ACCENT_RED}`, 
+                paddingBottom: 2 // Added padding for spacing above the border
               }}
-              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                e.currentTarget.src = 'https://placehold.co/600x450/333333/ffffff?text=Image+Error';
+            >
+              <Typography variant="subtitle2" color={isLight ? '#333' : '#aaa'} mb={0.5}>
+                {imageUrl1 ? 'Overlay Image' : 'Overlay Image Not Found'}
+              </Typography>
+              <CardMedia
+                component="img"
+                image={imageUrl1 || fallbackImage}
+                alt={`${campaign.title} Overlay Image`}
+                sx={{
+                  borderRadius: 2,
+                  width: '100%',
+                  height: 'auto',
+                  maxHeight: { xs: 350, md: 500 }, 
+                  objectFit: 'contain', 
+                }}
+                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                  e.currentTarget.src = fallbackImage;
+                }}
+              />
+            </Box>
+
+            {/* Image 2: target_url */}
+            <Box
+              sx={{ 
+                // ADDED: Red bottom border to the image frame
+                borderBottom: `2px solid ${ACCENT_RED}`, 
+                paddingBottom: 2 // Added padding for spacing above the border
               }}
-            />
+            >
+              <Typography variant="subtitle2" color={isLight ? '#333' : '#aaa'} mb={0.5}>
+                {imageUrl2 ? 'Target Image' : 'Target Image Not Found'}
+              </Typography>
+              <CardMedia
+                component="img"
+                image={imageUrl2 || fallbackImage}
+                alt={`${campaign.title} Target Image`}
+                sx={{
+                  borderRadius: 2,
+                  width: '100%',
+                  height: 'auto',
+                  maxHeight: { xs: 350, md: 500 }, 
+                  objectFit: 'contain', 
+                }}
+                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                  e.currentTarget.src = fallbackImage;
+                }}
+              />
+            </Box>
           </Box>
 
+
+          {/* DETAILS CONTAINER */}
           <Box sx={{ flex: '1 1 50%', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
               <Chip
