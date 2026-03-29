@@ -6,13 +6,10 @@ import { uploadCampaignHandler } from '../handlers/uploadCampaign';
 import { getImagesHandler } from '../handlers/getImagesHandler';
 import { getCampaign, getUnredactedImage } from '../handlers/ar';
 import { getRedactedImagesBulk, updateTarget } from '../handlers/postTarget';
-import { upload } from '../utils/fileManager';
+import { upload, uploadMind } from '../utils/fileManager'; // ← add uploadMind
 import { uploadImagesHandler } from '../handlers/UploadImages';
 
 const router = Router();
-
-// Campaign routes - del
-
 
 router.post(
   '/campaign/upload',
@@ -20,9 +17,6 @@ router.post(
   uploadCampaignHandler,
 );
 
-// Target route - del
-
-// Toggle Campaign Active route
 router.put('/toggleCampaign/:id', allowAll, toggleCampaignActive);
 
 // AR routes
@@ -34,10 +28,9 @@ router.post('/marketing/images/redacted', allowAll, (req, res) => { void getReda
 router.put(
   '/marketing/campaign/target',
   allowAll,
-  upload.fields([{ name: 'targetMind', maxCount: 1 }]),
+  uploadMind.fields([{ name: 'targetMind', maxCount: 1 }]), // ← use uploadMind
   (req, res) => { void updateTarget(req, res); }
 );
-
 
 router.post(
   '/uploadImages',

@@ -1,30 +1,35 @@
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { Request } from 'express';
 
-const uploadsDirectory = path.join(__dirname, '../../public/uploads');
-
-const multerStorage = multer.diskStorage({
-  destination: (_request: Request, _file, callback) => {
-    try {
-      fs.mkdirSync(uploadsDirectory, { recursive: true });
-      callback(null, uploadsDirectory);
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      callback(error, uploadsDirectory);
-    }
-  },
-  filename: (_request, file, callback) => {
-    const timestampAndRandom = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const fileExtension = path.extname(file.originalname) || '';
-    callback(null, `${timestampAndRandom}${fileExtension}`);
-  },
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const upload = multer({ storage: multerStorage });
+const imageStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'arm/images',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    resource_type: 'image',
+  } as object,
+});
+
+const mindStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'arm/mind',
+    resource_type: 'raw',
+    allowed_formats: ['mind'],
+  } as object,
+});
+
+export const upload = multer({ storage: imageStorage });
+export const uploadMind = multer({ storage: mindStorage });
 
 export function fileUrlFromFilename(storedFilename: string | undefined | null): string {
   if (!storedFilename) return '';
-  return `/uploads/${storedFilename}`;
+  return storedFilename;
 }
